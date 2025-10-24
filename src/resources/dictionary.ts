@@ -579,6 +579,18 @@ const chinaExam: DictionaryResource[] = [
     language: 'en',
     languageCategory: 'en',
   },
+
+  {
+    id: 'self',
+    name: 'self',
+    description: 'self',
+    category: '英语词典',
+    tags: ['其他'],
+    url: '/dicts/self.json',
+    length: 2000,
+    language: 'en',
+    languageCategory: 'en',
+  },
 ]
 
 // 国际考试
