@@ -120,6 +120,26 @@ export default function WordPanel() {
     },
     { preventDefault: true },
   )
+
+  // 添加简单的左右方向键快捷键
+  useHotkeys(
+    'ArrowLeft',
+    (e) => {
+      e.preventDefault()
+      onSkipWord('prev')
+    },
+    { preventDefault: true },
+  )
+
+  useHotkeys(
+    'ArrowRight',
+    (e) => {
+      e.preventDefault()
+      onSkipWord('next')
+    },
+    { preventDefault: true },
+  )
+
   const [isShowTranslation, setIsHoveringTranslation] = useState(false)
 
   const handleShowTranslation = useCallback((checked: boolean) => {
