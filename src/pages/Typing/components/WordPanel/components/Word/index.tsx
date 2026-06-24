@@ -24,6 +24,7 @@ import {
 import type { Word } from '@/typings'
 import { CTRL, getUtcStringForMixpanel } from '@/utils'
 import { useSaveWordRecord } from '@/utils/db'
+import type { LetterMistakes } from '@/utils/db/record'
 import { useAtomValue } from 'jotai'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
@@ -218,6 +219,7 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
     } else {
       // 出错时
       playBeepSound()
+      let currentLetterMistake: LetterMistakes = {}
       setWordState((state) => {
         state.letterStates[inputLength - 1] = 'wrong'
         state.hasWrong = true
@@ -231,9 +233,10 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
           state.letterMistake[inputLength - 1] = [inputChar]
         }
 
-        const currentState = JSON.parse(JSON.stringify(state))
-        dispatch({ type: TypingStateActionType.REPORT_WRONG_WORD, payload: { letterMistake: currentState.letterMistake } })
+        currentLetterMistake = JSON.parse(JSON.stringify(state.letterMistake))
       })
+
+      dispatch({ type: TypingStateActionType.REPORT_WRONG_WORD, payload: { letterMistake: currentLetterMistake } })
 
       if (currentChapter === 0 && state.chapterData.index === 0 && wordState.wrongCount >= 3) {
         setShowTipAlert(true)
