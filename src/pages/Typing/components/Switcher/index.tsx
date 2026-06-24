@@ -22,7 +22,7 @@ export default function Switcher() {
   const { state, dispatch } = useContext(TypingContext) ?? {}
 
   const changeDarkModeState = () => {
-    setIsOpenDarkMode((old) => !old)
+    setIsOpenDarkMode(!isOpenDarkMode)
   }
 
   const changeTransVisibleState = () => {

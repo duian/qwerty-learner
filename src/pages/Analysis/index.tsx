@@ -14,14 +14,14 @@ import IconX from '~icons/tabler/x'
 
 const Analysis = () => {
   const navigate = useNavigate()
-  const [, setIsOpenDarkMode] = useAtom(isOpenDarkModeAtom)
+  const [isOpenDarkMode, setIsOpenDarkMode] = useAtom(isOpenDarkModeAtom)
 
   const onBack = useCallback(() => {
     navigate('/')
   }, [navigate])
 
   const changeDarkModeState = () => {
-    setIsOpenDarkMode((old) => !old)
+    setIsOpenDarkMode(!isOpenDarkMode)
   }
 
   useHotkeys(
