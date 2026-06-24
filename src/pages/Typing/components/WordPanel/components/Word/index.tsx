@@ -76,7 +76,8 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
     newWordState.startTime = getUtcStringForMixpanel()
     newWordState.randomLetterVisible = headword.split('').map(() => Math.random() > 0.4)
     setWordState(newWordState)
-  }, [word, setWordState, currentDictId, currentChapter])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [word, setWordState])
 
   const updateInput = useCallback(
     (updateAction: WordUpdateAction) => {
