@@ -47,13 +47,20 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
   const [isHoveringWord, setIsHoveringWord] = useState(false)
   const currentLanguage = useAtomValue(currentDictInfoAtom).language
   const currentLanguageCategory = useAtomValue(currentDictInfoAtom).languageCategory
+  const currentDictId = useAtomValue(currentDictInfoAtom).id
   const currentChapter = useAtomValue(currentChapterAtom)
+
+  // 快照当前单词所属的词典和章节，防止切换词典后保存记录时使用错误的值
+  const wordContextRef = useRef({ dictId: currentDictId, chapter: currentChapter })
 
   const [showTipAlert, setShowTipAlert] = useState(false)
   const wordPronunciationIconRef = useRef<WordPronunciationIconRef>(null)
 
   useEffect(() => {
     // run only when word changes
+    // 快照当前词典和章节，确保保存记录时使用正确的值
+    wordContextRef.current = { dictId: currentDictId, chapter: currentChapter }
+
     let headword = ''
     try {
       headword = word.name.replace(new RegExp(' ', 'g'), EXPLICIT_SPACE)
@@ -69,7 +76,7 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
     newWordState.startTime = getUtcStringForMixpanel()
     newWordState.randomLetterVisible = headword.split('').map(() => Math.random() > 0.4)
     setWordState(newWordState)
-  }, [word, setWordState])
+  }, [word, setWordState, currentDictId, currentChapter])
 
   const updateInput = useCallback(
     (updateAction: WordUpdateAction) => {
@@ -267,6 +274,8 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
         wrongCount: wordState.wrongCount,
         letterTimeArray: wordState.letterTimeArray,
         letterMistake: wordState.letterMistake,
+        overrideDictId: wordContextRef.current.dictId,
+        overrideChapter: wordContextRef.current.chapter,
       })
 
       onFinish()

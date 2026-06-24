@@ -90,11 +90,15 @@ export function useSaveWordRecord() {
       wrongCount,
       letterTimeArray,
       letterMistake,
+      overrideDictId,
+      overrideChapter,
     }: {
       word: string
       wrongCount: number
       letterTimeArray: number[]
       letterMistake: LetterMistakes
+      overrideDictId?: string
+      overrideChapter?: number | null
     }) => {
       const timing = []
       for (let i = 1; i < letterTimeArray.length; i++) {
@@ -102,7 +106,10 @@ export function useSaveWordRecord() {
         timing.push(diff)
       }
 
-      const wordRecord = new WordRecord(word, dictID, isRevision ? -1 : currentChapter, timing, wrongCount, letterMistake)
+      const finalDictId = overrideDictId ?? dictID
+      const finalChapter = overrideChapter !== undefined ? overrideChapter : isRevision ? -1 : currentChapter
+
+      const wordRecord = new WordRecord(word, finalDictId, finalChapter, timing, wrongCount, letterMistake)
 
       let dbID = -1
       try {
