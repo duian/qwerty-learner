@@ -14,7 +14,7 @@ import {
 import { db } from '@/utils/db'
 import { Transition } from '@headlessui/react'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import { useCallback, useContext, useEffect, useMemo } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useNavigate } from 'react-router-dom'
 import IconX from '~icons/tabler/x'
@@ -40,8 +40,21 @@ const ResultScreen = () => {
   }, [dispatch])
 
   // 错题练习模式：完成后删除正确输入的单词记录
+  // 通过比对 reviewRecord.words 确认当前确实是错题练习模式（非 localStorage 残留）
+  const hasCleanedRef = useRef(false)
   useEffect(() => {
-    if (!isErrorBookMode) return
+    if (!isErrorBookMode || hasCleanedRef.current) return
+
+    const reviewWords = reviewModeInfo.reviewRecord?.words
+    if (!reviewWords || reviewWords.length === 0) return
+
+    // 验证当前 chapterData 的单词确实来自错题集 reviewRecord
+    const reviewWordNames = new Set(reviewWords.map((w) => w.name))
+    const currentWordNames = state.chapterData.words.map((w) => w.name)
+    const isFromErrorBook = currentWordNames.length > 0 && currentWordNames.every((name) => reviewWordNames.has(name))
+    if (!isFromErrorBook) return
+
+    hasCleanedRef.current = true
 
     const correctWords = state.chapterData.userInputLogs
       .filter((log) => log.wrongCount === 0)
@@ -59,7 +72,7 @@ const ResultScreen = () => {
         .delete(),
     )
     Promise.all(deletePromises).catch(console.error)
-  }, [isErrorBookMode, state.chapterData.userInputLogs, state.chapterData.words])
+  }, [isErrorBookMode, reviewModeInfo.reviewRecord?.words, state.chapterData.userInputLogs, state.chapterData.words])
 
   const wrongWords = useMemo(() => {
     return state.chapterData.userInputLogs
