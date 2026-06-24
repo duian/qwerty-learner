@@ -4,12 +4,14 @@ import bookCover from '@/assets/book-cover.png'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import useIntersectionObserver from '@/hooks/useIntersectionObserver'
-import { currentDictIdAtom } from '@/store'
+import { currentDictIdAtom, favoriteDictIdsAtom } from '@/store'
 import type { Dictionary } from '@/typings'
 import { calcChapterCount } from '@/utils'
 import * as Progress from '@radix-ui/react-progress'
-import { useAtomValue } from 'jotai'
-import { useMemo, useRef } from 'react'
+import { useAtom, useAtomValue } from 'jotai'
+import { useCallback, useMemo, useRef } from 'react'
+import IconStar from '~icons/tabler/star'
+import IconStarFilled from '~icons/tabler/star-filled'
 
 interface Props {
   dictionary: Dictionary
@@ -17,6 +19,7 @@ interface Props {
 
 export default function DictionaryComponent({ dictionary }: Props) {
   const currentDictID = useAtomValue(currentDictIdAtom)
+  const [favoriteDictIds, setFavoriteDictIds] = useAtom(favoriteDictIdsAtom)
 
   const divRef = useRef<HTMLDivElement>(null)
   const entry = useIntersectionObserver(divRef, {})
@@ -24,9 +27,19 @@ export default function DictionaryComponent({ dictionary }: Props) {
   const dictStats = useDictStats(dictionary.id, isVisible)
   const chapterCount = useMemo(() => calcChapterCount(dictionary.length), [dictionary.length])
   const isSelected = currentDictID === dictionary.id
+  const isFavorite = favoriteDictIds.includes(dictionary.id)
   const progress = useMemo(
     () => (dictStats ? Math.ceil((dictStats.exercisedChapterCount / chapterCount) * 100) : 0),
     [dictStats, chapterCount],
+  )
+
+  const toggleFavorite = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      e.preventDefault()
+      setFavoriteDictIds((ids) => (ids.includes(dictionary.id) ? ids.filter((id) => id !== dictionary.id) : [...ids, dictionary.id]))
+    },
+    [dictionary.id, setFavoriteDictIds],
   )
 
   return (
@@ -80,6 +93,20 @@ export default function DictionaryComponent({ dictionary }: Props) {
                 </Progress.Root>
               )}
               <img src={bookCover} className={`absolute right-3 top-3 w-16 ${isSelected ? 'opacity-50' : 'opacity-20'}`} />
+              <button
+                type="button"
+                onClick={toggleFavorite}
+                className={`absolute right-1 top-[-8px] z-10 p-1 transition-colors ${
+                  isFavorite
+                    ? 'text-yellow-400'
+                    : isSelected
+                    ? 'text-white/60 hover:text-yellow-300'
+                    : 'text-gray-300 hover:text-yellow-400'
+                }`}
+                aria-label={isFavorite ? '取消收藏' : '收藏词典'}
+              >
+                {isFavorite ? <IconStarFilled className="h-5 w-5" /> : <IconStar className="h-5 w-5" />}
+              </button>
             </div>
           </div>
         </div>

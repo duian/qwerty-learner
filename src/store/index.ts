@@ -142,6 +142,8 @@ export const isShowSkipAtom = atom(false)
 
 export const isInDevModeAtom = atom(false)
 
+export const favoriteDictIdsAtom = atomWithStorage<string[]>('favoriteDictIds', [])
+
 export const infoPanelStateAtom = atom<InfoPanelState>({
   donate: false,
   vsc: false,
