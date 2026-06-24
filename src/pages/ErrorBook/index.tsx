@@ -4,14 +4,18 @@ import type { ISortType } from './HeadWrongNumber'
 import HeadWrongNumber from './HeadWrongNumber'
 import Pagination, { ITEM_PER_PAGE } from './Pagination'
 import RowDetail from './RowDetail'
+import { useErrorBookWords } from './hooks/useErrorBookWords'
 import { currentRowDetailAtom } from './store'
 import type { groupedWordRecords } from './type'
+import { reviewModeInfoAtom } from '@/store'
 import { db, useDeleteWordRecord } from '@/utils/db'
 import type { WordRecord } from '@/utils/db/record'
+import { ReviewRecord } from '@/utils/db/record'
 import * as ScrollArea from '@radix-ui/react-scroll-area'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import IconPlayerPlay from '~icons/tabler/player-play'
 import IconX from '~icons/tabler/x'
 
 export function ErrorBook() {
@@ -23,6 +27,8 @@ export function ErrorBook() {
   const currentRowDetail = useAtomValue(currentRowDetailAtom)
   const { deleteWordRecord } = useDeleteWordRecord()
   const [reload, setReload] = useState(false)
+  const { fetchErrorBookWords, isLoading: isPracticeLoading } = useErrorBookWords()
+  const setReviewModeInfo = useSetAtom(reviewModeInfoAtom)
 
   const onBack = useCallback(() => {
     navigate('/')
@@ -94,10 +100,28 @@ export function ErrorBook() {
     setReload((prev) => !prev)
   }
 
+  const handleStartPractice = useCallback(async () => {
+    const words = await fetchErrorBookWords()
+    if (words.length === 0) return
+
+    const reviewRecord = new ReviewRecord('errorBook', words)
+    setReviewModeInfo({ isReviewMode: true, reviewRecord })
+    navigate('/')
+  }, [fetchErrorBookWords, setReviewModeInfo, navigate])
+
   return (
     <>
       <div className={`relative flex h-screen w-full flex-col items-center pb-4 ease-in ${currentRowDetail && 'blur-sm'}`}>
         <div className="mr-8 mt-4 flex w-auto items-center justify-center self-end">
+          <button
+            type="button"
+            onClick={handleStartPractice}
+            disabled={isPracticeLoading || groupedRecords.length === 0}
+            className="mr-4 flex items-center gap-1.5 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <IconPlayerPlay className="h-4 w-4" />
+            {isPracticeLoading ? '加载中...' : '开始练习'}
+          </button>
           <h1 className="font-lighter mr-4 w-auto self-end text-gray-500 opacity-70">Tip: 点击错误单词查看详细信息 </h1>
           <IconX className="h-7 w-7 cursor-pointer text-gray-400" onClick={onBack} />
         </div>

@@ -11,6 +11,7 @@ import {
   reviewModeInfoAtom,
   wordDictationConfigAtom,
 } from '@/store'
+import { db } from '@/utils/db'
 import { Transition } from '@headlessui/react'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useContext, useEffect, useMemo } from 'react'
@@ -30,11 +31,35 @@ const ResultScreen = () => {
 
   const setReviewModeInfo = useSetAtom(reviewModeInfoAtom)
   const isReviewMode = useAtomValue(isReviewModeAtom)
+  const reviewModeInfo = useAtomValue(reviewModeInfoAtom)
+  const isErrorBookMode = isReviewMode && reviewModeInfo.reviewRecord?.dict === 'errorBook'
 
   useEffect(() => {
     // tick a zero timer to calc the stats
     dispatch({ type: TypingStateActionType.TICK_TIMER, addTime: 0 })
   }, [dispatch])
+
+  // 错题练习模式：完成后删除正确输入的单词记录
+  useEffect(() => {
+    if (!isErrorBookMode) return
+
+    const correctWords = state.chapterData.userInputLogs
+      .filter((log) => log.wrongCount === 0)
+      .map((log) => state.chapterData.words[log.index]?.name)
+      .filter(Boolean)
+
+    if (correctWords.length === 0) return
+
+    // 从 DB 删除正确完成的单词的所有错误记录
+    const deletePromises = correctWords.map((wordName) =>
+      db.wordRecords
+        .where('word')
+        .equals(wordName)
+        .and((r) => r.wrongCount > 0)
+        .delete(),
+    )
+    Promise.all(deletePromises).catch(console.error)
+  }, [isErrorBookMode, state.chapterData.userInputLogs, state.chapterData.words])
 
   const wrongWords = useMemo(() => {
     return state.chapterData.userInputLogs
