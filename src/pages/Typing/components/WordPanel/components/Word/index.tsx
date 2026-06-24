@@ -260,16 +260,7 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
 
   useEffect(() => {
     if (wordState.isFinished) {
-      dispatch({ type: TypingStateActionType.SET_IS_SAVING_RECORD, payload: true })
-
-      // wordLogUploader({
-      //   headword: word.name,
-      //   timeStart: wordState.startTime,
-      //   timeEnd: wordState.endTime,
-      //   countInput: wordState.correctCount + wordState.wrongCount,
-      //   countCorrect: wordState.correctCount,
-      //   countTypo: wordState.wrongCount,
-      // })
+      // 先保存记录，再通知父组件状态变更（避免 dispatch 导致的渲染中断影响保存）
       saveWordRecord({
         word: word.name,
         wrongCount: wordState.wrongCount,
@@ -277,8 +268,11 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
         letterMistake: wordState.letterMistake,
         overrideDictId: wordContextRef.current.dictId,
         overrideChapter: wordContextRef.current.chapter,
+      }).then(() => {
+        // saveWordRecord 内部已经 dispatch SET_IS_SAVING_RECORD false
       })
 
+      dispatch({ type: TypingStateActionType.SET_IS_SAVING_RECORD, payload: true })
       onFinish()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
