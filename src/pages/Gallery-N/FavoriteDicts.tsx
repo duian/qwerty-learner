@@ -1,14 +1,21 @@
 import DictionaryComponent from './DictionaryWithoutCover'
 import { idDictionaryMap } from '@/resources/dictionary'
 import { favoriteDictIdsAtom } from '@/store'
-import { useAtomValue } from 'jotai'
-import { useMemo } from 'react'
+import { useAtom } from 'jotai'
+import { useEffect, useMemo } from 'react'
 import IconStarFilled from '~icons/tabler/star-filled'
 
 export default function FavoriteDicts() {
-  const favoriteDictIds = useAtomValue(favoriteDictIdsAtom)
+  const [favoriteDictIds, setFavoriteDictIds] = useAtom(favoriteDictIdsAtom)
 
   const favoriteDicts = useMemo(() => favoriteDictIds.map((id) => idDictionaryMap[id]).filter(Boolean), [favoriteDictIds])
+
+  // 清理 localStorage 中已失效的词典 ID
+  useEffect(() => {
+    if (favoriteDicts.length < favoriteDictIds.length) {
+      setFavoriteDictIds(favoriteDictIds.filter((id) => idDictionaryMap[id]))
+    }
+  }, [favoriteDicts.length, favoriteDictIds, setFavoriteDictIds])
 
   if (favoriteDicts.length === 0) return null
 

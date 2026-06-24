@@ -20,9 +20,9 @@ const Analysis = () => {
     navigate('/')
   }, [navigate])
 
-  const changeDarkModeState = () => {
+  const changeDarkModeState = useCallback(() => {
     setIsOpenDarkMode(!isOpenDarkMode)
-  }
+  }, [isOpenDarkMode, setIsOpenDarkMode])
 
   useHotkeys(
     'ctrl+d',
@@ -30,7 +30,7 @@ const Analysis = () => {
       changeDarkModeState()
     },
     { enableOnFormTags: true, preventDefault: true },
-    [],
+    [changeDarkModeState],
   )
 
   useHotkeys('enter,esc', onBack, { preventDefault: true })
