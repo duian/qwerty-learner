@@ -587,7 +587,7 @@ const chinaExam: DictionaryResource[] = [
     category: '英语词典',
     tags: ['其他'],
     url: '/dicts/self.json',
-    length: 2000,
+    length: 14,
     language: 'en',
     languageCategory: 'en',
   },

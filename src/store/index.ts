@@ -9,6 +9,7 @@ import type {
   LoopWordTimesOption,
   PhoneticType,
   PronunciationType,
+  Theme,
   WordDictationOpenBy,
   WordDictationType,
 } from '@/typings'
@@ -89,7 +90,53 @@ export const phoneticConfigAtom = atomForConfig('phoneticConfig', {
   type: 'us' as PhoneticType,
 })
 
-export const isOpenDarkModeAtom = atomWithStorage('isOpenDarkModeAtom', window.matchMedia('(prefers-color-scheme: dark)').matches)
+// 数据迁移：从旧的 isOpenDarkModeAtom 迁移到新的 themeAtom
+const migrateThemeData = (): Theme => {
+  try {
+    const oldValue = localStorage.getItem('isOpenDarkModeAtom')
+    const newValue = localStorage.getItem('theme')
+
+    // 如果新值已存在，直接使用
+    if (newValue) {
+      return JSON.parse(newValue) as Theme
+    }
+
+    // 如果旧值存在，执行迁移
+    if (oldValue !== null) {
+      const isDark = JSON.parse(oldValue)
+      const migratedTheme: Theme = isDark ? 'dark' : 'light'
+      localStorage.setItem('theme', JSON.stringify(migratedTheme))
+      localStorage.removeItem('isOpenDarkModeAtom')
+      return migratedTheme
+    }
+  } catch (error) {
+    console.error('Theme migration failed:', error)
+  }
+
+  // 默认值
+  return 'auto'
+}
+
+export const themeAtom = atomWithStorage<Theme>('theme', migrateThemeData())
+
+export const actualThemeAtom = atom<'light' | 'dark'>((get) => {
+  const theme = get(themeAtom)
+  if (theme === 'auto') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  }
+  return theme
+})
+
+/**
+ * @deprecated 使用 themeAtom 和 actualThemeAtom 代替
+ * 兼容层：保持与旧代码的兼容性
+ */
+export const isOpenDarkModeAtom = atom(
+  (get) => get(actualThemeAtom) === 'dark',
+  (get, set, newValue: boolean) => {
+    set(themeAtom, newValue ? 'dark' : 'light')
+  },
+)
 
 export const isShowSkipAtom = atom(false)
 
@@ -109,9 +156,6 @@ export const wordDictationConfigAtom = atomForConfig('wordDictationConfig', {
 })
 
 export const dismissStartCardDateAtom = atomWithStorage<Date | null>(DISMISS_START_CARD_DATE_KEY, null)
-
-// Enhanced version promotion popup state
-export const hasSeenEnhancedPromotionAtom = atomWithStorage('hasSeenEnhancedPromotion', false)
 
 // for dev test
 //   dismissStartCardDateAtom = atom<Date | null>(new Date())

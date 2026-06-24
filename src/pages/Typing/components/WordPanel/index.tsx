@@ -121,14 +121,14 @@ export default function WordPanel() {
     { preventDefault: true },
   )
 
-  // 添加简单的左右方向键快捷键
+  // 添加简单的左右方向键快捷键（仅在未输入状态下生效）
   useHotkeys(
     'ArrowLeft',
     (e) => {
       e.preventDefault()
       onSkipWord('prev')
     },
-    { preventDefault: true },
+    { preventDefault: true, enableOnFormTags: true, enabled: !state.isTyping },
   )
 
   useHotkeys(
@@ -137,7 +137,7 @@ export default function WordPanel() {
       e.preventDefault()
       onSkipWord('next')
     },
-    { preventDefault: true },
+    { preventDefault: true, enableOnFormTags: true, enabled: !state.isTyping },
   )
 
   const [isShowTranslation, setIsHoveringTranslation] = useState(false)
