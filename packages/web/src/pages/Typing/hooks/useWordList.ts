@@ -1,7 +1,7 @@
 import { CHAPTER_LENGTH } from '@/constants'
 import { currentChapterAtom, currentDictInfoAtom, reviewModeInfoAtom } from '@/store'
 import type { Word, WordWithIndex } from '@/typings/index'
-import { wordListFetcher } from '@/utils/wordListFetcher'
+import { USE_API, fetchFromAPI, fetchFromJSON } from '@/utils/wordListFetcher'
 import { useAtom, useAtomValue } from 'jotai'
 import { useMemo } from 'react'
 import useSWR from 'swr'
@@ -26,7 +26,26 @@ export function useWordList(): UseWordListResult {
   }
 
   const isFirstChapter = !isReviewMode && currentDictInfo.id === 'cet4' && currentChapter === 0
-  const { data: wordList, error, isLoading } = useSWR(currentDictInfo.url, wordListFetcher)
+
+  // API mode: fetch paginated chapter directly from the backend.
+  const {
+    data: apiWords,
+    error: apiError,
+    isLoading: apiLoading,
+  } = useSWR(
+    USE_API && !isReviewMode && !isFirstChapter ? ['words', currentDictInfo.id, currentChapter] : null,
+    ([, dictId, chapter]) => fetchFromAPI(dictId as string, chapter as number),
+  )
+
+  // JSON mode: fetch the full dictionary and slice client-side (original behaviour).
+  const {
+    data: jsonWordList,
+    error: jsonError,
+    isLoading: jsonLoading,
+  } = useSWR(!USE_API && !isReviewMode ? currentDictInfo.url : null, fetchFromJSON)
+
+  const isLoading = USE_API ? apiLoading : jsonLoading
+  const error: Error | undefined = USE_API ? (apiError as Error | undefined) : (jsonError as Error | undefined)
 
   const words: WordWithIndex[] = useMemo(() => {
     let newWords: Word[]
@@ -34,8 +53,10 @@ export function useWordList(): UseWordListResult {
       newWords = firstChapter
     } else if (isReviewMode) {
       newWords = reviewRecord?.words ?? []
-    } else if (wordList) {
-      newWords = wordList.slice(currentChapter * CHAPTER_LENGTH, (currentChapter + 1) * CHAPTER_LENGTH)
+    } else if (USE_API) {
+      newWords = apiWords ?? []
+    } else if (jsonWordList) {
+      newWords = jsonWordList.slice(currentChapter * CHAPTER_LENGTH, (currentChapter + 1) * CHAPTER_LENGTH)
     } else {
       newWords = []
     }
@@ -56,7 +77,7 @@ export function useWordList(): UseWordListResult {
         trans,
       }
     })
-  }, [isFirstChapter, isReviewMode, wordList, reviewRecord?.words, currentChapter])
+  }, [isFirstChapter, isReviewMode, apiWords, jsonWordList, reviewRecord?.words, currentChapter])
 
   return { words, isLoading, error }
 }
