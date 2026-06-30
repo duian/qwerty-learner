@@ -6,6 +6,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "extract-meta": "tsx --tsconfig src/scripts/tsconfig.scripts.json src/scripts/extract-meta.ts",
     "import-dicts": "tsx src/scripts/import-dicts.ts",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
