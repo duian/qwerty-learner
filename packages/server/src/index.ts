@@ -1,14 +1,7 @@
-// Server entry point placeholder
-// To be implemented in subsequent tasks
-import express from 'express'
+import { app } from "./app";
 
-const app = express()
-const PORT = process.env.PORT ?? 3001
-
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' })
-})
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+  console.log(`Server running on http://localhost:${PORT}`);
+});
