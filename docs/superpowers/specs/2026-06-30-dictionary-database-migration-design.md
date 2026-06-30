@@ -22,15 +22,15 @@
 
 ## 技术决策
 
-| 决策项 | 选择 | 理由 |
-|--------|------|------|
-| 后端框架 | Express | 成熟稳定，后续可包入 Tauri |
-| 数据库 | SQLite（本地优先） | 零部署，后续可通过 Turso 扩展到云端 |
-| ORM | Drizzle | 轻量，SQL-like API，TypeScript 类型推导好 |
-| 代码组织 | pnpm workspace Monorepo | 前后端共享类型，轻量无额外依赖 |
-| 网络请求 | axios（前后端统一） | 统一请求库 |
-| 用户系统 | 暂不做认证，预留 userId 字段 | 后续加认证时平滑迁移 |
-| 迁移策略 | 渐进式（方案一） | 风险低，可逐步验证 |
+| 决策项   | 选择                         | 理由                                      |
+| -------- | ---------------------------- | ----------------------------------------- |
+| 后端框架 | Express                      | 成熟稳定，后续可包入 Tauri                |
+| 数据库   | SQLite（本地优先）           | 零部署，后续可通过 Turso 扩展到云端       |
+| ORM      | Drizzle                      | 轻量，SQL-like API，TypeScript 类型推导好 |
+| 代码组织 | pnpm workspace Monorepo      | 前后端共享类型，轻量无额外依赖            |
+| 网络请求 | axios（前后端统一）          | 统一请求库                                |
+| 用户系统 | 暂不做认证，预留 userId 字段 | 后续加认证时平滑迁移                      |
+| 迁移策略 | 渐进式（方案一）             | 风险低，可逐步验证                        |
 
 ## Monorepo 结构
 
@@ -87,64 +87,64 @@ qwerty-learner/
 
 ### dictionaries（词典表）
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | TEXT PK | 词典标识（如 "cet4"） |
-| name | TEXT NOT NULL | 词典名称 |
-| description | TEXT | 描述 |
-| category | TEXT NOT NULL | 分类（"en", "ja", "code"） |
-| language | TEXT NOT NULL | 语言标识 |
-| wordCount | INTEGER NOT NULL | 单词总数 |
-| userId | TEXT | 预留：null 为系统词典 |
-| createdAt | INTEGER NOT NULL | 创建时间戳 |
-| updatedAt | INTEGER NOT NULL | 更新时间戳 |
+| 字段        | 类型             | 说明                       |
+| ----------- | ---------------- | -------------------------- |
+| id          | TEXT PK          | 词典标识（如 "cet4"）      |
+| name        | TEXT NOT NULL    | 词典名称                   |
+| description | TEXT             | 描述                       |
+| category    | TEXT NOT NULL    | 分类（"en", "ja", "code"） |
+| language    | TEXT NOT NULL    | 语言标识                   |
+| wordCount   | INTEGER NOT NULL | 单词总数                   |
+| userId      | TEXT             | 预留：null 为系统词典      |
+| createdAt   | INTEGER NOT NULL | 创建时间戳                 |
+| updatedAt   | INTEGER NOT NULL | 更新时间戳                 |
 
 ### words（单词表）
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | INTEGER PK AUTO | 自增主键 |
-| dictId | TEXT NOT NULL FK | 所属词典 |
-| name | TEXT NOT NULL | 单词本身 |
-| trans | TEXT NOT NULL | JSON 字符串，翻译列表 |
-| usphone | TEXT | 美式音标 |
-| ukphone | TEXT | 英式音标 |
-| notation | TEXT | 可选标注 |
-| sortOrder | INTEGER NOT NULL | 排序位置 |
+| 字段      | 类型             | 说明                  |
+| --------- | ---------------- | --------------------- |
+| id        | INTEGER PK AUTO  | 自增主键              |
+| dictId    | TEXT NOT NULL FK | 所属词典              |
+| name      | TEXT NOT NULL    | 单词本身              |
+| trans     | TEXT NOT NULL    | JSON 字符串，翻译列表 |
+| usphone   | TEXT             | 美式音标              |
+| ukphone   | TEXT             | 英式音标              |
+| notation  | TEXT             | 可选标注              |
+| sortOrder | INTEGER NOT NULL | 排序位置              |
 
 索引：`(dictId, sortOrder)` — 按章节分页查询
 
 ### favorites（收藏表）
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | INTEGER PK AUTO | 自增主键 |
-| userId | TEXT | 预留 |
-| wordId | INTEGER NOT NULL FK | 关联单词 |
-| dictId | TEXT NOT NULL | 冗余，方便按词典筛选 |
-| createdAt | INTEGER NOT NULL | 收藏时间 |
+| 字段      | 类型                | 说明                 |
+| --------- | ------------------- | -------------------- |
+| id        | INTEGER PK AUTO     | 自增主键             |
+| userId    | TEXT                | 预留                 |
+| wordId    | INTEGER NOT NULL FK | 关联单词             |
+| dictId    | TEXT NOT NULL       | 冗余，方便按词典筛选 |
+| createdAt | INTEGER NOT NULL    | 收藏时间             |
 
 唯一约束：`(userId, wordId)`
 
 ### wordbooks（自定义词库表）
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | INTEGER PK AUTO | 自增主键 |
-| userId | TEXT | 预留 |
-| name | TEXT NOT NULL | 词库名称 |
-| description | TEXT | 描述 |
-| createdAt | INTEGER NOT NULL | 创建时间 |
-| updatedAt | INTEGER NOT NULL | 更新时间 |
+| 字段        | 类型             | 说明     |
+| ----------- | ---------------- | -------- |
+| id          | INTEGER PK AUTO  | 自增主键 |
+| userId      | TEXT             | 预留     |
+| name        | TEXT NOT NULL    | 词库名称 |
+| description | TEXT             | 描述     |
+| createdAt   | INTEGER NOT NULL | 创建时间 |
+| updatedAt   | INTEGER NOT NULL | 更新时间 |
 
 ### wordbook_words（词库-单词关联表）
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | INTEGER PK AUTO | 自增主键 |
+| 字段       | 类型                | 说明     |
+| ---------- | ------------------- | -------- |
+| id         | INTEGER PK AUTO     | 自增主键 |
 | wordbookId | INTEGER NOT NULL FK | 所属词库 |
-| wordId | INTEGER NOT NULL FK | 关联单词 |
-| sortOrder | INTEGER NOT NULL | 排序 |
+| wordId     | INTEGER NOT NULL FK | 关联单词 |
+| sortOrder  | INTEGER NOT NULL    | 排序     |
 
 唯一约束：`(wordbookId, wordId)`
 
@@ -154,37 +154,37 @@ qwerty-learner/
 
 ### 词典
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /dictionaries | 获取所有词典列表 |
-| GET | /dictionaries/:id | 获取单个词典详情 |
+| 方法 | 路径              | 说明             |
+| ---- | ----------------- | ---------------- |
+| GET  | /dictionaries     | 获取所有词典列表 |
+| GET  | /dictionaries/:id | 获取单个词典详情 |
 
 ### 单词
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /dictionaries/:id/words?chapter=0&pageSize=20 | 按章节分页获取单词 |
-| GET | /dictionaries/:id/words/search?keyword=hello | 词典内搜索 |
+| 方法 | 路径                                          | 说明               |
+| ---- | --------------------------------------------- | ------------------ |
+| GET  | /dictionaries/:id/words?chapter=0&pageSize=20 | 按章节分页获取单词 |
+| GET  | /dictionaries/:id/words/search?keyword=hello  | 词典内搜索         |
 
 ### 收藏
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /favorites?dictId=cet4 | 获取收藏列表 |
-| POST | /favorites | 添加收藏 `{ wordId, dictId }` |
-| DELETE | /favorites/:id | 取消收藏 |
+| 方法   | 路径                   | 说明                          |
+| ------ | ---------------------- | ----------------------------- |
+| GET    | /favorites?dictId=cet4 | 获取收藏列表                  |
+| POST   | /favorites             | 添加收藏 `{ wordId, dictId }` |
+| DELETE | /favorites/:id         | 取消收藏                      |
 
 ### 自定义词库
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /wordbooks | 获取词库列表 |
-| POST | /wordbooks | 创建词库 `{ name, description }` |
-| PUT | /wordbooks/:id | 更新词库信息 |
-| DELETE | /wordbooks/:id | 删除词库 |
-| GET | /wordbooks/:id/words | 获取词库内单词 |
-| POST | /wordbooks/:id/words | 添加单词 `{ wordId }` |
-| DELETE | /wordbooks/:id/words/:wordId | 移除单词 |
+| 方法   | 路径                         | 说明                             |
+| ------ | ---------------------------- | -------------------------------- |
+| GET    | /wordbooks                   | 获取词库列表                     |
+| POST   | /wordbooks                   | 创建词库 `{ name, description }` |
+| PUT    | /wordbooks/:id               | 更新词库信息                     |
+| DELETE | /wordbooks/:id               | 删除词库                         |
+| GET    | /wordbooks/:id/words         | 获取词库内单词                   |
+| POST   | /wordbooks/:id/words         | 添加单词 `{ wordId }`            |
+| DELETE | /wordbooks/:id/words/:wordId | 移除单词                         |
 
 ### 设计原则
 

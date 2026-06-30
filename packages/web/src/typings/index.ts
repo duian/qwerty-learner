@@ -1,11 +1,10 @@
 export * from './resource'
+export type { Dictionary, DictionaryResource, LanguageCategoryType, LanguageType, Word, WordWithIndex } from '@qwerty-learner/shared'
 
 export type Theme = 'light' | 'dark' | 'auto'
 
 export type PronunciationType = 'us' | 'uk' | 'romaji' | 'zh' | 'ja' | 'de' | 'hapin' | 'kk' | 'id'
 export type PhoneticType = 'us' | 'uk' | 'romaji' | 'zh' | 'ja' | 'de' | 'hapin' | 'kk' | 'id'
-export type LanguageType = 'en' | 'romaji' | 'zh' | 'ja' | 'code' | 'de' | 'kk' | 'hapin' | 'id'
-export type LanguageCategoryType = 'en' | 'ja' | 'de' | 'code' | 'kk' | 'id'
 
 type Pronunciation2PhoneticMap = Record<PronunciationType, PhoneticType>
 
@@ -19,19 +18,6 @@ export const PRONUNCIATION_PHONETIC_MAP: Pronunciation2PhoneticMap = {
   hapin: 'hapin',
   kk: 'kk',
   id: 'id',
-}
-
-export type Word = {
-  name: string
-  trans: string[]
-  usphone: string
-  ukphone: string
-  notation?: string
-}
-
-export type WordWithIndex = Word & {
-  // 在 chapter 中的原始索引
-  index: number
 }
 
 export type InfoPanelType = 'donate' | 'vsc' | 'community' | 'redBook'

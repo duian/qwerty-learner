@@ -23,6 +23,7 @@
 ### Task 1: 初始化 Monorepo 结构
 
 **Files:**
+
 - Create: `pnpm-workspace.yaml`
 - Create: `packages/shared/package.json`
 - Create: `packages/shared/tsconfig.json`
@@ -34,6 +35,7 @@
 - Create: `.npmrc`
 
 **Interfaces:**
+
 - Produces: `@qwerty-learner/shared` 包导出 `Word`, `WordWithIndex`, `DictionaryResource`, `Dictionary` 类型
 
 - [ ] **Step 1: 安装 pnpm 并创建 workspace 配置**
@@ -118,6 +120,7 @@ export type Dictionary = DictionaryResource & { chapterCount: number }
 - [ ] **Step 3: 移动前端代码到 packages/web**
 
 将现有项目根目录的前端文件移入 `packages/web/`：
+
 - 移动：`src/`, `public/`, `index.html`, `vite.config.ts`, `tsconfig.json`, `tsconfig.node.json`, `tailwind.config.js`, `postcss.config.js`, `components.json`
 - 创建 `packages/web/package.json`（从根 package.json 提取前端依赖）
 
@@ -245,6 +248,7 @@ git commit -m "refactor: 初始化 pnpm workspace monorepo 结构
 ### Task 2: 搭建 Express 后端 MVC 骨架
 
 **Files:**
+
 - Create: `packages/server/src/index.ts`
 - Create: `packages/server/src/app.ts`
 - Create: `packages/server/src/routes/index.ts`
@@ -253,6 +257,7 @@ git commit -m "refactor: 初始化 pnpm workspace monorepo 结构
 - Create: `packages/server/src/middlewares/error-handler.ts`
 
 **Interfaces:**
+
 - Consumes: `@qwerty-learner/shared` 的 `Word`, `Dictionary` 类型
 - Produces: Express app 实例，`GET /api/v1/dictionaries` 路由（暂返回空数组）
 
@@ -260,10 +265,10 @@ git commit -m "refactor: 初始化 pnpm workspace monorepo 结构
 
 ```typescript
 // packages/server/src/app.ts
-import express from 'express'
-import cors from 'cors'
-import { router } from './routes/index'
 import { errorHandler } from './middlewares/error-handler'
+import { router } from './routes/index'
+import cors from 'cors'
+import express from 'express'
 
 const app = express()
 
@@ -305,8 +310,8 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
 
 ```typescript
 // packages/server/src/routes/index.ts
-import { Router } from 'express'
 import { DictionaryController } from '../controllers/dictionary.controller'
+import { Router } from 'express'
 
 const router = Router()
 const dictionaryController = new DictionaryController()
@@ -360,11 +365,13 @@ git commit -m "feat(server): 搭建 Express MVC 骨架
 ### Task 3: Drizzle Schema 定义与数据库初始化
 
 **Files:**
+
 - Create: `packages/server/src/models/schema.ts`
 - Create: `packages/server/src/models/index.ts`
 - Create: `packages/server/drizzle.config.ts`
 
 **Interfaces:**
+
 - Produces: Drizzle schema 表定义（`dictionaries`, `words`, `favorites`, `wordbooks`, `wordbookWords`），`db` 实例供 service 层使用
 
 - [ ] **Step 1: 定义 Drizzle schema**
@@ -453,9 +460,9 @@ export const wordbookWords = sqliteTable(
 
 ```typescript
 // packages/server/src/models/index.ts
+import * as schema from './schema'
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
-import * as schema from './schema'
 import path from 'path'
 
 const DB_PATH = path.resolve(__dirname, '../../data/qwerty.db')
@@ -518,9 +525,11 @@ git commit -m "feat(server): 定义 Drizzle schema 并初始化数据库
 ### Task 4: 数据导入脚本
 
 **Files:**
+
 - Create: `packages/server/src/scripts/import-dicts.ts`
 
 **Interfaces:**
+
 - Consumes: `db` 实例, schema 定义, 前端 `/public/dicts/*.json` 文件和 `dictionary.ts` 元数据
 - Produces: 填充完成的 SQLite 数据库（376 词典，约 20-30 万单词）
 
@@ -528,9 +537,9 @@ git commit -m "feat(server): 定义 Drizzle schema 并初始化数据库
 
 ```typescript
 // packages/server/src/scripts/import-dicts.ts
+import * as schema from '../models/schema'
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
-import * as schema from '../models/schema'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -615,15 +624,7 @@ async function main() {
 
       for (let i = 0; i < wordsData.length; i++) {
         const word = wordsData[i]
-        insertWord.run(
-          meta.id,
-          word.name,
-          JSON.stringify(word.trans),
-          word.usphone || null,
-          word.ukphone || null,
-          word.notation || null,
-          i,
-        )
+        insertWord.run(meta.id, word.name, JSON.stringify(word.trans), word.usphone || null, word.ukphone || null, word.notation || null, i)
       }
     })
 
@@ -678,6 +679,7 @@ main().catch(console.error)
 ```
 
 在 `packages/server/package.json` scripts 中添加：
+
 ```json
 "extract-meta": "tsx src/scripts/extract-meta.ts"
 ```
@@ -699,7 +701,7 @@ sqlite3 packages/server/data/qwerty.db "SELECT COUNT(*) FROM words;"
 sqlite3 packages/server/data/qwerty.db "SELECT * FROM words WHERE dict_id='cet4' LIMIT 3;"
 ```
 
-Expected: dictionaries = 376, words = 20万+，CET4 单词数据完整。
+Expected: dictionaries = 376, words = 20 万+，CET4 单词数据完整。
 
 - [ ] **Step 5: 将 qwerty.db 加入 .gitignore**
 
@@ -724,6 +726,7 @@ git commit -m "feat(server): 添加词典数据导入脚本
 ### Task 5: 实现词典和单词 API（Service + Controller）
 
 **Files:**
+
 - Create: `packages/server/src/services/dictionary.service.ts`
 - Create: `packages/server/src/services/word.service.ts`
 - Modify: `packages/server/src/controllers/dictionary.controller.ts`
@@ -731,6 +734,7 @@ git commit -m "feat(server): 添加词典数据导入脚本
 - Modify: `packages/server/src/routes/index.ts`
 
 **Interfaces:**
+
 - Consumes: `db` 实例, schema (`dictionaries`, `words` 表)
 - Produces: `GET /api/v1/dictionaries`, `GET /api/v1/dictionaries/:id`, `GET /api/v1/dictionaries/:id/words?chapter=&pageSize=`, `GET /api/v1/dictionaries/:id/words/search?keyword=`
 
@@ -738,8 +742,8 @@ git commit -m "feat(server): 添加词典数据导入脚本
 
 ```typescript
 // packages/server/src/services/dictionary.service.ts
-import { eq } from 'drizzle-orm'
 import { db, schema } from '../models'
+import { eq } from 'drizzle-orm'
 
 export class DictionaryService {
   async findAll() {
@@ -757,8 +761,8 @@ export class DictionaryService {
 
 ```typescript
 // packages/server/src/services/word.service.ts
-import { eq, and, like, asc } from 'drizzle-orm'
 import { db, schema } from '../models'
+import { eq, and, like, asc } from 'drizzle-orm'
 
 const DEFAULT_PAGE_SIZE = 20
 
@@ -789,8 +793,8 @@ export class WordService {
 
 ```typescript
 // packages/server/src/controllers/dictionary.controller.ts
-import type { Request, Response, NextFunction } from 'express'
 import { DictionaryService } from '../services/dictionary.service'
+import type { Request, Response, NextFunction } from 'express'
 
 const dictionaryService = new DictionaryService()
 
@@ -822,8 +826,8 @@ export class DictionaryController {
 
 ```typescript
 // packages/server/src/controllers/word.controller.ts
-import type { Request, Response, NextFunction } from 'express'
 import { WordService } from '../services/word.service'
+import type { Request, Response, NextFunction } from 'express'
 
 const wordService = new WordService()
 
@@ -870,9 +874,9 @@ export class WordController {
 
 ```typescript
 // packages/server/src/routes/index.ts
-import { Router } from 'express'
 import { DictionaryController } from '../controllers/dictionary.controller'
 import { WordController } from '../controllers/word.controller'
+import { Router } from 'express'
 
 const router = Router()
 const dictionaryController = new DictionaryController()
@@ -920,6 +924,7 @@ git commit -m "feat(server): 实现词典和单词 CRUD API
 ### Task 6: 实现收藏和自定义词库 API
 
 **Files:**
+
 - Create: `packages/server/src/services/favorite.service.ts`
 - Create: `packages/server/src/services/wordbook.service.ts`
 - Create: `packages/server/src/controllers/favorite.controller.ts`
@@ -927,6 +932,7 @@ git commit -m "feat(server): 实现词典和单词 CRUD API
 - Modify: `packages/server/src/routes/index.ts`
 
 **Interfaces:**
+
 - Consumes: `db` 实例, schema (`favorites`, `wordbooks`, `wordbookWords` 表)
 - Produces: 收藏 CRUD API, 自定义词库 CRUD API
 
@@ -934,8 +940,8 @@ git commit -m "feat(server): 实现词典和单词 CRUD API
 
 ```typescript
 // packages/server/src/services/favorite.service.ts
-import { eq, and } from 'drizzle-orm'
 import { db, schema } from '../models'
+import { eq, and } from 'drizzle-orm'
 
 export class FavoriteService {
   async findAll(dictId?: string) {
@@ -964,8 +970,8 @@ export class FavoriteService {
 
 ```typescript
 // packages/server/src/services/wordbook.service.ts
-import { eq } from 'drizzle-orm'
 import { db, schema } from '../models'
+import { eq } from 'drizzle-orm'
 
 export class WordbookService {
   async findAll() {
@@ -1045,8 +1051,8 @@ export class WordbookService {
 
 ```typescript
 // packages/server/src/controllers/favorite.controller.ts
-import type { Request, Response, NextFunction } from 'express'
 import { FavoriteService } from '../services/favorite.service'
+import type { Request, Response, NextFunction } from 'express'
 
 const favoriteService = new FavoriteService()
 
@@ -1090,8 +1096,8 @@ export class FavoriteController {
 
 ```typescript
 // packages/server/src/controllers/wordbook.controller.ts
-import type { Request, Response, NextFunction } from 'express'
 import { WordbookService } from '../services/wordbook.service'
+import type { Request, Response, NextFunction } from 'express'
 
 const wordbookService = new WordbookService()
 
@@ -1238,12 +1244,14 @@ git commit -m "feat(server): 实现收藏和自定义词库 API
 ### Task 7: 前端接入 API 数据源
 
 **Files:**
+
 - Modify: `packages/web/vite.config.ts`（添加 proxy）
 - Create: `packages/web/src/utils/api.ts`（axios 实例）
 - Modify: `packages/web/src/utils/wordListFetcher.ts`（切换数据源）
 - Modify: `packages/web/src/pages/Typing/hooks/useWordList.ts`（适配新 fetcher）
 
 **Interfaces:**
+
 - Consumes: 后端 API `/api/v1/dictionaries/:id/words?chapter=&pageSize=`
 - Produces: 前端通过环境变量切换到 API 数据源，保持 `useWordList` 对外接口不变
 
@@ -1285,8 +1293,8 @@ export { api }
 
 ```typescript
 // packages/web/src/utils/wordListFetcher.ts
-import type { Word } from '@/typings'
 import { api } from './api'
+import type { Word } from '@/typings'
 
 const REACT_APP_DEPLOY_ENV = import.meta.env.REACT_APP_DEPLOY_ENV || ''
 const USE_API = import.meta.env.VITE_USE_API === 'true'
@@ -1321,20 +1329,17 @@ export { fetchFromAPI, fetchFromJSON, USE_API }
 - 当 `USE_API=false` 时：保持原有逻辑（fetch 整个 JSON，客户端切片）
 
 核心改动点：
+
 ```typescript
 import { fetchFromAPI, fetchFromJSON, USE_API } from '@/utils/wordListFetcher'
 
 // API 模式下的 SWR 调用
-const { data: apiWords } = useSWR(
-  USE_API ? ['words', currentDictInfo.id, currentChapter] : null,
-  ([, dictId, chapter]) => fetchFromAPI(dictId, chapter),
+const { data: apiWords } = useSWR(USE_API ? ['words', currentDictInfo.id, currentChapter] : null, ([, dictId, chapter]) =>
+  fetchFromAPI(dictId, chapter),
 )
 
 // JSON 模式保持原逻辑
-const { data: jsonWordList } = useSWR(
-  !USE_API ? currentDictInfo.url : null,
-  fetchFromJSON,
-)
+const { data: jsonWordList } = useSWR(!USE_API ? currentDictInfo.url : null, fetchFromJSON)
 ```
 
 - [ ] **Step 5: 添加环境变量**
