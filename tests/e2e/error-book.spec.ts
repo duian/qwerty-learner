@@ -48,7 +48,10 @@ test.describe('Error Book - word records saved correctly after switching dict', 
     await page.waitForTimeout(500)
 
     // Click on CET-6 dict (or any other dict)
-    await page.getByRole('button', { name: /六级真题核心词/g }).first().click()
+    await page
+      .getByRole('button', { name: /六级真题核心词/g })
+      .first()
+      .click()
     await page.waitForTimeout(300)
     // Select chapter 1
     await page.getByRole('heading', { name: '第 1 章' }).click()
@@ -84,7 +87,10 @@ test.describe('Error Book - word records saved correctly after switching dict', 
     await page.waitForTimeout(500)
 
     // Select CET-6 真题核心词
-    await page.getByRole('button', { name: /六级真题核心词/g }).first().click()
+    await page
+      .getByRole('button', { name: /六级真题核心词/g })
+      .first()
+      .click()
     await page.waitForTimeout(300)
     await page.getByRole('heading', { name: '第 1 章' }).click()
     await page.waitForURL('**/')

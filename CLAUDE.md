@@ -37,6 +37,7 @@ Important: `isOpenDarkModeAtom` is a derived writable atom — pass explicit boo
 ### Keyboard Shortcuts
 
 Uses `react-hotkeys-hook`. Key conventions:
+
 - Hotkeys that must fire during active typing need `{ enableOnFormTags: true }` (because TextAreaHandler uses a focused textarea).
 - Hotkeys that should NOT fire during typing should use `{ enabled: !state.isTyping }` as a guard.
 - Arrow key navigation uses modifier keys (Ctrl+Shift+Arrow) during typing, bare arrows only when not typing.
@@ -55,17 +56,17 @@ Tailwind CSS 3 with `darkMode: 'class'`. Dark mode is toggled by adding/removing
 
 ### Key Libraries
 
-| Purpose | Library |
-|---------|---------|
-| State | Jotai (atoms + atomWithStorage) |
-| Data fetching | SWR |
-| Styling | Tailwind CSS 3 |
-| Icons | unplugin-icons (Tabler, Heroicons, custom) |
-| Audio | Howler.js |
-| Charts | ECharts |
-| Local DB | Dexie (IndexedDB) |
-| Hotkeys | react-hotkeys-hook |
-| Animations | animate.css, canvas-confetti |
+| Purpose       | Library                                    |
+| ------------- | ------------------------------------------ |
+| State         | Jotai (atoms + atomWithStorage)            |
+| Data fetching | SWR                                        |
+| Styling       | Tailwind CSS 3                             |
+| Icons         | unplugin-icons (Tabler, Heroicons, custom) |
+| Audio         | Howler.js                                  |
+| Charts        | ECharts                                    |
+| Local DB      | Dexie (IndexedDB)                          |
+| Hotkeys       | react-hotkeys-hook                         |
+| Animations    | animate.css, canvas-confetti               |
 
 ### ESLint Rules
 
