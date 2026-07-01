@@ -1,14 +1,26 @@
 FROM node:20 AS build
 
-# 设置工作目录
 WORKDIR /app
 
-COPY . .
-RUN npm config set registry  https://registry.npmmirror.com  
-RUN npm install
-RUN npm run build
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# 将构建好的 React 应用复制到 Nginx 容器的默认站点目录
+# Copy workspace config first for layer caching
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc ./
+COPY packages/web/package.json packages/web/
+COPY packages/shared/package.json packages/shared/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source
+COPY packages/shared/ packages/shared/
+COPY packages/web/ packages/web/
+
+# Build web package
+RUN pnpm --filter @qwerty-learner/web build
+
+# Serve with nginx
 FROM nginx:alpine
-COPY ./public/default.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/build /app
+COPY packages/web/public/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/packages/web/build /app
