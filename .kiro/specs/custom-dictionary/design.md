@@ -84,18 +84,18 @@
 
 ```typescript
 interface CustomDictionary {
-  id: string // 主键，等于 name
-  name: string // 词典名称（1-50字符）
-  description: string // 词典描述（最多200字符）
-  category: string // 分类（固定为"自定义"）
-  tags: string[] // 标签（默认 ["自定义"]）
-  language: LanguageType // 语言类型（默认 "en"）
-  languageCategory: LanguageCategoryType // 语言分类（默认 "en"）
-  length: number // 单词数量
-  chapterCount: number // 章节数（自动计算：Math.ceil(length / 20)）
-  createdAt: number // 创建时间戳
-  updatedAt: number // 更新时间戳
-  isCustom: true // 标识为自定义词典
+  id: string; // 主键，等于 name
+  name: string; // 词典名称（1-50字符）
+  description: string; // 词典描述（最多200字符）
+  category: string; // 分类（固定为"自定义"）
+  tags: string[]; // 标签（默认 ["自定义"]）
+  language: LanguageType; // 语言类型（默认 "en"）
+  languageCategory: LanguageCategoryType; // 语言分类（默认 "en"）
+  length: number; // 单词数量
+  chapterCount: number; // 章节数（自动计算：Math.ceil(length / 20)）
+  createdAt: number; // 创建时间戳
+  updatedAt: number; // 更新时间戳
+  isCustom: true; // 标识为自定义词典
 }
 ```
 
@@ -103,14 +103,14 @@ interface CustomDictionary {
 
 ```typescript
 interface CustomWord {
-  id?: number // 自增主键（由 Dexie 自动生成）
-  dictId: string // 外键，关联词典 ID
-  name: string // 单词（1-50字符）
-  trans: string[] // 翻译数组
-  usphone?: string // 美式音标（可选）
-  ukphone?: string // 英式音标（可选）
-  createdAt: number // 创建时间戳
-  updatedAt: number // 更新时间戳
+  id?: number; // 自增主键（由 Dexie 自动生成）
+  dictId: string; // 外键，关联词典 ID
+  name: string; // 单词（1-50字符）
+  trans: string[]; // 翻译数组
+  usphone?: string; // 美式音标（可选）
+  ukphone?: string; // 英式音标（可选）
+  createdAt: number; // 创建时间戳
+  updatedAt: number; // 更新时间戳
 }
 ```
 
@@ -119,19 +119,19 @@ interface CustomWord {
 ```typescript
 interface ExportFormat {
   metadata: {
-    name: string
-    description: string
-    category: string
-    length: number
-    createdAt: number
-    exportedAt: number
-  }
+    name: string;
+    description: string;
+    category: string;
+    length: number;
+    createdAt: number;
+    exportedAt: number;
+  };
   words: Array<{
-    name: string
-    trans: string[]
-    usphone?: string
-    ukphone?: string
-  }>
+    name: string;
+    trans: string[];
+    usphone?: string;
+    ukphone?: string;
+  }>;
 }
 ```
 
@@ -142,28 +142,38 @@ interface ExportFormat {
 ```typescript
 class CustomDictService {
   // 创建词典
-  async create(dict: Omit<CustomDictionary, 'id' | 'createdAt' | 'updatedAt' | 'length' | 'chapterCount' | 'isCustom'>): Promise<string>
+  async create(
+    dict: Omit<
+      CustomDictionary,
+      "id" | "createdAt" | "updatedAt" | "length" | "chapterCount" | "isCustom"
+    >
+  ): Promise<string>;
 
   // 更新词典元数据
   async update(
     id: string,
-    updates: Partial<Pick<CustomDictionary, 'name' | 'description' | 'category' | 'tags' | 'language'>>,
-  ): Promise<void>
+    updates: Partial<
+      Pick<
+        CustomDictionary,
+        "name" | "description" | "category" | "tags" | "language"
+      >
+    >
+  ): Promise<void>;
 
   // 删除词典（级联删除所有单词）
-  async delete(id: string): Promise<void>
+  async delete(id: string): Promise<void>;
 
   // 获取所有自定义词典
-  async getAll(): Promise<CustomDictionary[]>
+  async getAll(): Promise<CustomDictionary[]>;
 
   // 根据 ID 获取词典
-  async getById(id: string): Promise<CustomDictionary | undefined>
+  async getById(id: string): Promise<CustomDictionary | undefined>;
 
   // 更新词典的单词数量
-  async updateLength(id: string, length: number): Promise<void>
+  async updateLength(id: string, length: number): Promise<void>;
 
   // 验证词典名称是否可用
-  async isNameAvailable(name: string, excludeId?: string): Promise<boolean>
+  async isNameAvailable(name: string, excludeId?: string): Promise<boolean>;
 }
 ```
 
@@ -172,22 +182,29 @@ class CustomDictService {
 ```typescript
 class WordService {
   // 添加单词
-  async add(word: Omit<CustomWord, 'id' | 'createdAt' | 'updatedAt'>): Promise<number>
+  async add(
+    word: Omit<CustomWord, "id" | "createdAt" | "updatedAt">
+  ): Promise<number>;
 
   // 更新单词
-  async update(id: number, updates: Partial<Omit<CustomWord, 'id' | 'dictId' | 'createdAt'>>): Promise<void>
+  async update(
+    id: number,
+    updates: Partial<Omit<CustomWord, "id" | "dictId" | "createdAt">>
+  ): Promise<void>;
 
   // 删除单词
-  async delete(id: number): Promise<void>
+  async delete(id: number): Promise<void>;
 
   // 获取词典的所有单词
-  async getByDictId(dictId: string): Promise<CustomWord[]>
+  async getByDictId(dictId: string): Promise<CustomWord[]>;
 
   // 批量添加单词
-  async addBatch(words: Array<Omit<CustomWord, 'id' | 'createdAt' | 'updatedAt'>>): Promise<number[]>
+  async addBatch(
+    words: Array<Omit<CustomWord, "id" | "createdAt" | "updatedAt">>
+  ): Promise<number[]>;
 
   // 搜索单词
-  async search(dictId: string, query: string): Promise<CustomWord[]>
+  async search(dictId: string, query: string): Promise<CustomWord[]>;
 }
 ```
 
@@ -196,16 +213,18 @@ class WordService {
 ```typescript
 class ImportExportService {
   // 导出词典为 JSON
-  async exportDict(dictId: string): Promise<Blob>
+  async exportDict(dictId: string): Promise<Blob>;
 
   // 导入词典
-  async importDict(file: File): Promise<{ success: boolean; dictId?: string; error?: string }>
+  async importDict(
+    file: File
+  ): Promise<{ success: boolean; dictId?: string; error?: string }>;
 
   // 验证导入文件格式
-  validateImportFile(data: unknown): { valid: boolean; error?: string }
+  validateImportFile(data: unknown): { valid: boolean; error?: string };
 
   // 生成导出文件名
-  generateExportFilename(dictName: string): string
+  generateExportFilename(dictName: string): string;
 }
 ```
 
@@ -218,10 +237,10 @@ interface CreateCustomDictPageProps {}
 
 // 表单数据
 interface DictFormData {
-  name: string
-  description: string
-  category: string
-  language: LanguageType
+  name: string;
+  description: string;
+  category: string;
+  language: LanguageType;
 }
 ```
 
@@ -233,10 +252,10 @@ interface ManageWordsPageProps {
 }
 
 interface WordFormData {
-  name: string
-  trans: string
-  usphone: string
-  ukphone: string
+  name: string;
+  trans: string;
+  usphone: string;
+  ukphone: string;
 }
 ```
 
@@ -244,10 +263,10 @@ interface WordFormData {
 
 ```typescript
 interface CustomDictCardProps {
-  dict: CustomDictionary
-  onEdit: (dict: CustomDictionary) => void
-  onDelete: (dictId: string) => void
-  onSelect: (dictId: string) => void
+  dict: CustomDictionary;
+  onEdit: (dict: CustomDictionary) => void;
+  onDelete: (dictId: string) => void;
+  onSelect: (dictId: string) => void;
 }
 ```
 
@@ -255,12 +274,12 @@ interface CustomDictCardProps {
 
 ```typescript
 interface WordListTableProps {
-  words: CustomWord[]
-  onEdit: (word: CustomWord) => void
-  onDelete: (wordId: number) => void
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
+  words: CustomWord[];
+  onEdit: (word: CustomWord) => void;
+  onDelete: (wordId: number) => void;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 ```
 
@@ -270,25 +289,25 @@ interface WordListTableProps {
 // 扩展 RecordDB 类
 class RecordDB extends Dexie {
   // 现有表...
-  customDictionaries!: Table<CustomDictionary, string>
-  customWords!: Table<CustomWord, number>
+  customDictionaries!: Table<CustomDictionary, string>;
+  customWords!: Table<CustomWord, number>;
 
   constructor() {
-    super('RecordDB')
+    super("RecordDB");
 
     // 现有版本...
 
     // 新增版本 4
     this.version(4).stores({
       // 保留现有表定义...
-      wordRecords: '++id,word,timeStamp,dict,chapter,wrongCount,[dict+chapter]',
-      chapterRecords: '++id,timeStamp,dict,chapter,time,[dict+chapter]',
-      reviewRecords: '++id,dict,createTime,isFinished',
+      wordRecords: "++id,word,timeStamp,dict,chapter,wrongCount,[dict+chapter]",
+      chapterRecords: "++id,timeStamp,dict,chapter,time,[dict+chapter]",
+      reviewRecords: "++id,dict,createTime,isFinished",
 
       // 新增表
-      customDictionaries: 'id,name,createdAt,updatedAt,category',
-      customWords: '++id,dictId,name,[dictId+name],createdAt',
-    })
+      customDictionaries: "id,name,createdAt,updatedAt,category",
+      customWords: "++id,dictId,name,[dictId+name],createdAt",
+    });
   }
 }
 ```
@@ -351,9 +370,9 @@ function customWordToWord(customWord: CustomWord): Word {
   return {
     name: customWord.name,
     trans: customWord.trans,
-    usphone: customWord.usphone || '',
-    ukphone: customWord.ukphone || '',
-  }
+    usphone: customWord.usphone || "",
+    ukphone: customWord.ukphone || "",
+  };
 }
 ```
 
@@ -367,12 +386,12 @@ function customDictToDictionary(customDict: CustomDictionary): Dictionary {
     description: customDict.description,
     category: customDict.category,
     tags: customDict.tags,
-    url: '', // 自定义词典没有 URL
+    url: "", // 自定义词典没有 URL
     length: customDict.length,
     language: customDict.language,
     languageCategory: customDict.languageCategory,
     chapterCount: customDict.chapterCount,
-  }
+  };
 }
 ```
 
@@ -505,13 +524,13 @@ _属性是一个特征或行为，应该在系统的所有有效执行中保持�
 
 ```typescript
 try {
-  await db.customDictionaries.add(dict)
+  await db.customDictionaries.add(dict);
 } catch (error) {
-  if (error.name === 'QuotaExceededError') {
-    showToast('存储空间不足，请清理浏览器数据或导出词典备份')
+  if (error.name === "QuotaExceededError") {
+    showToast("存储空间不足，请清理浏览器数据或导出词典备份");
   } else {
-    showToast('保存失败，请重试')
-    console.error('Failed to save dictionary:', error)
+    showToast("保存失败，请重试");
+    console.error("Failed to save dictionary:", error);
   }
 }
 ```
@@ -548,11 +567,11 @@ try {
 
 ```typescript
 interface ImportResult {
-  success: boolean
-  dictId?: string
-  importedWords: number
-  skippedWords: number
-  errors: string[]
+  success: boolean;
+  dictId?: string;
+  importedWords: number;
+  skippedWords: number;
+  errors: string[];
 }
 ```
 
@@ -594,38 +613,38 @@ interface ImportResult {
 **示例测试用例**：
 
 ```typescript
-describe('CustomDictService', () => {
-  it('should create a dictionary with valid data', async () => {
+describe("CustomDictService", () => {
+  it("should create a dictionary with valid data", async () => {
     const dict = {
-      name: 'Test Dict',
-      description: 'Test description',
-      category: '自定义',
-      tags: ['自定义'],
-      language: 'en' as LanguageType,
-      languageCategory: 'en' as LanguageCategoryType,
-    }
-    const id = await CustomDictService.create(dict)
-    expect(id).toBe('Test Dict')
+      name: "Test Dict",
+      description: "Test description",
+      category: "自定义",
+      tags: ["自定义"],
+      language: "en" as LanguageType,
+      languageCategory: "en" as LanguageCategoryType,
+    };
+    const id = await CustomDictService.create(dict);
+    expect(id).toBe("Test Dict");
 
-    const saved = await CustomDictService.getById(id)
-    expect(saved).toBeDefined()
-    expect(saved?.name).toBe('Test Dict')
-  })
+    const saved = await CustomDictService.getById(id);
+    expect(saved).toBeDefined();
+    expect(saved?.name).toBe("Test Dict");
+  });
 
-  it('should reject duplicate dictionary names', async () => {
+  it("should reject duplicate dictionary names", async () => {
     const dict = {
-      name: 'Duplicate',
-      description: 'Test',
-      category: '自定义',
-      tags: ['自定义'],
-      language: 'en' as LanguageType,
-      languageCategory: 'en' as LanguageCategoryType,
-    }
-    await CustomDictService.create(dict)
+      name: "Duplicate",
+      description: "Test",
+      category: "自定义",
+      tags: ["自定义"],
+      language: "en" as LanguageType,
+      languageCategory: "en" as LanguageCategoryType,
+    };
+    await CustomDictService.create(dict);
 
-    await expect(CustomDictService.create(dict)).rejects.toThrow()
-  })
-})
+    await expect(CustomDictService.create(dict)).rejects.toThrow();
+  });
+});
 ```
 
 **组件测试**：
@@ -638,16 +657,16 @@ describe('CustomDictService', () => {
 使用 **React Testing Library** 进行组件测试：
 
 ```typescript
-describe('CreateCustomDictPage', () => {
-  it('should show validation error for empty name', async () => {
-    render(<CreateCustomDictPage />)
+describe("CreateCustomDictPage", () => {
+  it("should show validation error for empty name", async () => {
+    render(<CreateCustomDictPage />);
 
-    const submitButton = screen.getByText('创建')
-    fireEvent.click(submitButton)
+    const submitButton = screen.getByText("创建");
+    fireEvent.click(submitButton);
 
-    expect(screen.getByText('词典名称不能为空')).toBeInTheDocument()
-  })
-})
+    expect(screen.getByText("词典名称不能为空")).toBeInTheDocument();
+  });
+});
 ```
 
 ### 属性测试
@@ -663,87 +682,94 @@ describe('CreateCustomDictPage', () => {
 **核心属性测试**：
 
 ```typescript
-import fc from 'fast-check'
+import fc from "fast-check";
 
 // Feature: custom-dictionary, Property 1: 词典创建的有效性
-describe('Property 1: Dictionary creation validity', () => {
-  it('should create dictionary for any valid input', async () => {
+describe("Property 1: Dictionary creation validity", () => {
+  it("should create dictionary for any valid input", async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.record({
-          name: fc.string({ minLength: 1, maxLength: 50 }).filter((s) => /^[a-zA-Z0-9_\-\s\u4e00-\u9fa5]+$/.test(s)),
+          name: fc
+            .string({ minLength: 1, maxLength: 50 })
+            .filter((s) => /^[a-zA-Z0-9_\-\s\u4e00-\u9fa5]+$/.test(s)),
           description: fc.string({ maxLength: 200 }),
-          category: fc.constantFrom('自定义', '专业术语', '错题本', '其他'),
+          category: fc.constantFrom("自定义", "专业术语", "错题本", "其他"),
         }),
         async (dictData) => {
           const id = await CustomDictService.create({
             ...dictData,
-            tags: ['自定义'],
-            language: 'en',
-            languageCategory: 'en',
-          })
+            tags: ["自定义"],
+            language: "en",
+            languageCategory: "en",
+          });
 
-          expect(id).toBe(dictData.name)
-          const saved = await CustomDictService.getById(id)
-          expect(saved).toBeDefined()
+          expect(id).toBe(dictData.name);
+          const saved = await CustomDictService.getById(id);
+          expect(saved).toBeDefined();
 
           // Cleanup
-          await CustomDictService.delete(id)
-        },
+          await CustomDictService.delete(id);
+        }
       ),
-      { numRuns: 100 },
-    )
-  })
-})
+      { numRuns: 100 }
+    );
+  });
+});
 
 // Feature: custom-dictionary, Property 2: 空白名称拒绝
-describe('Property 2: Blank name rejection', () => {
-  it('should reject any whitespace-only string as name', async () => {
+describe("Property 2: Blank name rejection", () => {
+  it("should reject any whitespace-only string as name", async () => {
     await fc.assert(
       fc.asyncProperty(
-        fc.string().filter((s) => s.trim() === '' && s.length > 0),
+        fc.string().filter((s) => s.trim() === "" && s.length > 0),
         async (blankName) => {
           await expect(
             CustomDictService.create({
               name: blankName,
-              description: 'Test',
-              category: '自定义',
-              tags: ['自定义'],
-              language: 'en',
-              languageCategory: 'en',
-            }),
-          ).rejects.toThrow()
-        },
+              description: "Test",
+              category: "自定义",
+              tags: ["自定义"],
+              language: "en",
+              languageCategory: "en",
+            })
+          ).rejects.toThrow();
+        }
       ),
-      { numRuns: 100 },
-    )
-  })
-})
+      { numRuns: 100 }
+    );
+  });
+});
 
 // Feature: custom-dictionary, Property 5: 单词添加增加计数
-describe('Property 5: Word addition increases count', () => {
-  it('should increase dictionary length by 1 for any word addition', async () => {
+describe("Property 5: Word addition increases count", () => {
+  it("should increase dictionary length by 1 for any word addition", async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.record({
-          dictName: fc.string({ minLength: 1, maxLength: 20 }).filter((s) => /^[a-zA-Z0-9_\-]+$/.test(s)),
+          dictName: fc
+            .string({ minLength: 1, maxLength: 20 })
+            .filter((s) => /^[a-zA-Z0-9_\-]+$/.test(s)),
           word: fc.record({
             name: fc.string({ minLength: 1, maxLength: 50 }),
-            trans: fc.array(fc.string({ minLength: 1, maxLength: 50 }), { minLength: 1 }),
+            trans: fc.array(fc.string({ minLength: 1, maxLength: 50 }), {
+              minLength: 1,
+            }),
           }),
         }),
         async ({ dictName, word }) => {
           // Create dictionary
           const dictId = await CustomDictService.create({
             name: dictName,
-            description: 'Test',
-            category: '自定义',
-            tags: ['自定义'],
-            language: 'en',
-            languageCategory: 'en',
-          })
+            description: "Test",
+            category: "自定义",
+            tags: ["自定义"],
+            language: "en",
+            languageCategory: "en",
+          });
 
-          const beforeLength = (await CustomDictService.getById(dictId))!.length
+          const beforeLength = (await CustomDictService.getById(dictId))!
+            .length;
 
           // Add word
           await WordService.add({
@@ -752,45 +778,50 @@ describe('Property 5: Word addition increases count', () => {
             trans: word.trans,
             createdAt: Date.now(),
             updatedAt: Date.now(),
-          })
+          });
 
-          const afterLength = (await CustomDictService.getById(dictId))!.length
-          expect(afterLength).toBe(beforeLength + 1)
+          const afterLength = (await CustomDictService.getById(dictId))!.length;
+          expect(afterLength).toBe(beforeLength + 1);
 
           // Cleanup
-          await CustomDictService.delete(dictId)
-        },
+          await CustomDictService.delete(dictId);
+        }
       ),
-      { numRuns: 100 },
-    )
-  })
-})
+      { numRuns: 100 }
+    );
+  });
+});
 
 // Feature: custom-dictionary, Property 13: 导出导入往返一致性
-describe('Property 13: Export-import round-trip consistency', () => {
-  it('should preserve word data through export and import', async () => {
+describe("Property 13: Export-import round-trip consistency", () => {
+  it("should preserve word data through export and import", async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.record({
-          dictName: fc.string({ minLength: 1, maxLength: 20 }).filter((s) => /^[a-zA-Z0-9_\-]+$/.test(s)),
+          dictName: fc
+            .string({ minLength: 1, maxLength: 20 })
+            .filter((s) => /^[a-zA-Z0-9_\-]+$/.test(s)),
           words: fc.array(
             fc.record({
               name: fc.string({ minLength: 1, maxLength: 20 }),
-              trans: fc.array(fc.string({ minLength: 1 }), { minLength: 1, maxLength: 3 }),
+              trans: fc.array(fc.string({ minLength: 1 }), {
+                minLength: 1,
+                maxLength: 3,
+              }),
             }),
-            { minLength: 1, maxLength: 10 },
+            { minLength: 1, maxLength: 10 }
           ),
         }),
         async ({ dictName, words }) => {
           // Create dictionary and add words
           const dictId = await CustomDictService.create({
             name: dictName,
-            description: 'Test',
-            category: '自定义',
-            tags: ['自定义'],
-            language: 'en',
-            languageCategory: 'en',
-          })
+            description: "Test",
+            category: "自定义",
+            tags: ["自定义"],
+            language: "en",
+            languageCategory: "en",
+          });
 
           for (const word of words) {
             await WordService.add({
@@ -798,33 +829,35 @@ describe('Property 13: Export-import round-trip consistency', () => {
               ...word,
               createdAt: Date.now(),
               updatedAt: Date.now(),
-            })
+            });
           }
 
           // Export
-          const exportBlob = await ImportExportService.exportDict(dictId)
-          const exportText = await exportBlob.text()
-          const exportData = JSON.parse(exportText)
+          const exportBlob = await ImportExportService.exportDict(dictId);
+          const exportText = await exportBlob.text();
+          const exportData = JSON.parse(exportText);
 
           // Import
-          const importFile = new File([exportText], 'test.json', { type: 'application/json' })
-          const result = await ImportExportService.importDict(importFile)
+          const importFile = new File([exportText], "test.json", {
+            type: "application/json",
+          });
+          const result = await ImportExportService.importDict(importFile);
 
-          expect(result.success).toBe(true)
+          expect(result.success).toBe(true);
 
           // Verify words match
-          const importedWords = await WordService.getByDictId(result.dictId!)
-          expect(importedWords.length).toBe(words.length)
+          const importedWords = await WordService.getByDictId(result.dictId!);
+          expect(importedWords.length).toBe(words.length);
 
           // Cleanup
-          await CustomDictService.delete(dictId)
-          await CustomDictService.delete(result.dictId!)
-        },
+          await CustomDictService.delete(dictId);
+          await CustomDictService.delete(result.dictId!);
+        }
       ),
-      { numRuns: 100 },
-    )
-  })
-})
+      { numRuns: 100 }
+    );
+  });
+});
 ```
 
 **生成器策略**：
@@ -850,32 +883,32 @@ describe('Property 13: Export-import round-trip consistency', () => {
 **示例测试**：
 
 ```typescript
-test('complete custom dictionary workflow', async ({ page }) => {
-  await page.goto('/gallery')
+test("complete custom dictionary workflow", async ({ page }) => {
+  await page.goto("/gallery");
 
   // Create dictionary
-  await page.click('text=创建自定义词典')
-  await page.fill('input[name="name"]', 'E2E Test Dict')
-  await page.fill('textarea[name="description"]', 'Test description')
-  await page.click('button:has-text("创建")')
+  await page.click("text=创建自定义词典");
+  await page.fill('input[name="name"]', "E2E Test Dict");
+  await page.fill('textarea[name="description"]', "Test description");
+  await page.click('button:has-text("创建")');
 
   // Add words
-  await page.click('text=添加单词')
-  await page.fill('input[name="word"]', 'test')
-  await page.fill('input[name="trans"]', '测试')
-  await page.click('button:has-text("保存")')
+  await page.click("text=添加单词");
+  await page.fill('input[name="word"]', "test");
+  await page.fill('input[name="trans"]', "测试");
+  await page.click('button:has-text("保存")');
 
   // Verify word appears in list
-  await expect(page.locator('text=test')).toBeVisible()
+  await expect(page.locator("text=test")).toBeVisible();
 
   // Start practice
-  await page.goto('/gallery')
-  await page.click('text=E2E Test Dict')
-  await page.goto('/')
+  await page.goto("/gallery");
+  await page.click("text=E2E Test Dict");
+  await page.goto("/");
 
   // Verify practice works
-  await expect(page.locator('text=test')).toBeVisible()
-})
+  await expect(page.locator("text=test")).toBeVisible();
+});
 ```
 
 ### 测试数据管理
@@ -885,9 +918,9 @@ test('complete custom dictionary workflow', async ({ page }) => {
 ```typescript
 beforeEach(async () => {
   // Clear test data
-  await db.customDictionaries.clear()
-  await db.customWords.clear()
-})
+  await db.customDictionaries.clear();
+  await db.customWords.clear();
+});
 ```
 
 **测试后清理**：
@@ -895,12 +928,14 @@ beforeEach(async () => {
 ```typescript
 afterEach(async () => {
   // Cleanup any created test data
-  const testDicts = await db.customDictionaries.filter((d) => d.name.startsWith('Test') || d.name.startsWith('E2E')).toArray()
+  const testDicts = await db.customDictionaries
+    .filter((d) => d.name.startsWith("Test") || d.name.startsWith("E2E"))
+    .toArray();
 
   for (const dict of testDicts) {
-    await CustomDictService.delete(dict.id)
+    await CustomDictService.delete(dict.id);
   }
-})
+});
 ```
 
 ### 测试覆盖率目标

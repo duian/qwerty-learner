@@ -1,6 +1,5 @@
-import type { Word } from '@/typings'
-
 import { api } from './api'
+import type { Word } from '@/typings'
 
 const USE_API = import.meta.env.VITE_USE_API === 'true'
 

@@ -43,7 +43,7 @@
 ```yaml
 # pnpm-workspace.yaml
 packages:
-  - 'packages/*'
+  - "packages/*"
 ```
 
 ```ini
@@ -83,38 +83,38 @@ shamefully-hoist=true
 
 ```typescript
 // packages/shared/src/index.ts
-export * from './types'
+export * from "./types";
 ```
 
 ```typescript
 // packages/shared/src/types.ts
-export type LanguageType = 'en' | 'romaji' | 'ja' | 'code' | 'de' | 'id' | 'kk'
-export type LanguageCategoryType = 'en' | 'ja' | 'de' | 'code' | 'id' | 'kk'
+export type LanguageType = "en" | "romaji" | "ja" | "code" | "de" | "id" | "kk";
+export type LanguageCategoryType = "en" | "ja" | "de" | "code" | "id" | "kk";
 
 export type Word = {
-  name: string
-  trans: string[]
-  usphone: string
-  ukphone: string
-  notation?: string
-}
+  name: string;
+  trans: string[];
+  usphone: string;
+  ukphone: string;
+  notation?: string;
+};
 
-export type WordWithIndex = Word & { index: number }
+export type WordWithIndex = Word & { index: number };
 
 export type DictionaryResource = {
-  id: string
-  name: string
-  description: string
-  category: string
-  tags: string[]
-  url: string
-  length: number
-  language: LanguageType
-  languageCategory: LanguageCategoryType
-  defaultPronIndex?: number
-}
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  tags: string[];
+  url: string;
+  length: number;
+  language: LanguageType;
+  languageCategory: LanguageCategoryType;
+  defaultPronIndex?: number;
+};
 
-export type Dictionary = DictionaryResource & { chapterCount: number }
+export type Dictionary = DictionaryResource & { chapterCount: number };
 ```
 
 - [ ] **Step 3: 移动前端代码到 packages/web**
@@ -265,44 +265,49 @@ git commit -m "refactor: 初始化 pnpm workspace monorepo 结构
 
 ```typescript
 // packages/server/src/app.ts
-import { errorHandler } from './middlewares/error-handler'
-import { router } from './routes/index'
-import cors from 'cors'
-import express from 'express'
+import { errorHandler } from "./middlewares/error-handler";
+import { router } from "./routes/index";
+import cors from "cors";
+import express from "express";
 
-const app = express()
+const app = express();
 
-app.use(cors())
-app.use(express.json())
-app.use('/api/v1', router)
-app.use(errorHandler)
+app.use(cors());
+app.use(express.json());
+app.use("/api/v1", router);
+app.use(errorHandler);
 
-export { app }
+export { app };
 ```
 
 ```typescript
 // packages/server/src/index.ts
-import { app } from './app'
+import { app } from "./app";
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
-})
+  console.log(`Server running on http://localhost:${PORT}`);
+});
 ```
 
 - [ ] **Step 2: 创建错误处理中间件**
 
 ```typescript
 // packages/server/src/middlewares/error-handler.ts
-import type { Request, Response, NextFunction } from 'express'
+import type { Request, Response, NextFunction } from "express";
 
-export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
-  console.error('[Error]', err.message)
+export function errorHandler(
+  err: Error,
+  _req: Request,
+  res: Response,
+  _next: NextFunction
+) {
+  console.error("[Error]", err.message);
   res.status(500).json({
     success: false,
-    message: err.message || 'Internal Server Error',
-  })
+    message: err.message || "Internal Server Error",
+  });
 }
 ```
 
@@ -310,30 +315,30 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
 
 ```typescript
 // packages/server/src/routes/index.ts
-import { DictionaryController } from '../controllers/dictionary.controller'
-import { Router } from 'express'
+import { DictionaryController } from "../controllers/dictionary.controller";
+import { Router } from "express";
 
-const router = Router()
-const dictionaryController = new DictionaryController()
+const router = Router();
+const dictionaryController = new DictionaryController();
 
-router.get('/dictionaries', dictionaryController.getAll)
-router.get('/dictionaries/:id', dictionaryController.getById)
+router.get("/dictionaries", dictionaryController.getAll);
+router.get("/dictionaries/:id", dictionaryController.getById);
 
-export { router }
+export { router };
 ```
 
 ```typescript
 // packages/server/src/controllers/dictionary.controller.ts
-import type { Request, Response, NextFunction } from 'express'
+import type { Request, Response, NextFunction } from "express";
 
 export class DictionaryController {
   getAll = async (_req: Request, res: Response, _next: NextFunction) => {
-    res.json({ success: true, data: [] })
-  }
+    res.json({ success: true, data: [] });
+  };
 
   getById = async (req: Request, res: Response, _next: NextFunction) => {
-    res.json({ success: true, data: { id: req.params.id } })
-  }
+    res.json({ success: true, data: { id: req.params.id } });
+  };
 }
 ```
 
@@ -378,116 +383,128 @@ git commit -m "feat(server): 搭建 Express MVC 骨架
 
 ```typescript
 // packages/server/src/models/schema.ts
-import { sqliteTable, text, integer, uniqueIndex, index } from 'drizzle-orm/sqlite-core'
+import {
+  sqliteTable,
+  text,
+  integer,
+  uniqueIndex,
+  index,
+} from "drizzle-orm/sqlite-core";
 
-export const dictionaries = sqliteTable('dictionaries', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  description: text('description'),
-  category: text('category').notNull(),
-  language: text('language').notNull(),
-  languageCategory: text('language_category').notNull(),
-  tags: text('tags').notNull(), // JSON string
-  wordCount: integer('word_count').notNull(),
-  userId: text('user_id'),
-  createdAt: integer('created_at').notNull(),
-  updatedAt: integer('updated_at').notNull(),
-})
+export const dictionaries = sqliteTable("dictionaries", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category").notNull(),
+  language: text("language").notNull(),
+  languageCategory: text("language_category").notNull(),
+  tags: text("tags").notNull(), // JSON string
+  wordCount: integer("word_count").notNull(),
+  userId: text("user_id"),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});
 
 export const words = sqliteTable(
-  'words',
+  "words",
   {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    dictId: text('dict_id')
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    dictId: text("dict_id")
       .notNull()
       .references(() => dictionaries.id),
-    name: text('name').notNull(),
-    trans: text('trans').notNull(), // JSON string
-    usphone: text('usphone'),
-    ukphone: text('ukphone'),
-    notation: text('notation'),
-    sortOrder: integer('sort_order').notNull(),
+    name: text("name").notNull(),
+    trans: text("trans").notNull(), // JSON string
+    usphone: text("usphone"),
+    ukphone: text("ukphone"),
+    notation: text("notation"),
+    sortOrder: integer("sort_order").notNull(),
   },
   (table) => ({
-    dictSortIdx: index('idx_words_dict_sort').on(table.dictId, table.sortOrder),
-  }),
-)
+    dictSortIdx: index("idx_words_dict_sort").on(table.dictId, table.sortOrder),
+  })
+);
 
 export const favorites = sqliteTable(
-  'favorites',
+  "favorites",
   {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    userId: text('user_id'),
-    wordId: integer('word_id')
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id"),
+    wordId: integer("word_id")
       .notNull()
       .references(() => words.id),
-    dictId: text('dict_id').notNull(),
-    createdAt: integer('created_at').notNull(),
+    dictId: text("dict_id").notNull(),
+    createdAt: integer("created_at").notNull(),
   },
   (table) => ({
-    userWordUniq: uniqueIndex('uniq_favorites_user_word').on(table.userId, table.wordId),
-  }),
-)
+    userWordUniq: uniqueIndex("uniq_favorites_user_word").on(
+      table.userId,
+      table.wordId
+    ),
+  })
+);
 
-export const wordbooks = sqliteTable('wordbooks', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: text('user_id'),
-  name: text('name').notNull(),
-  description: text('description'),
-  createdAt: integer('created_at').notNull(),
-  updatedAt: integer('updated_at').notNull(),
-})
+export const wordbooks = sqliteTable("wordbooks", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id"),
+  name: text("name").notNull(),
+  description: text("description"),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});
 
 export const wordbookWords = sqliteTable(
-  'wordbook_words',
+  "wordbook_words",
   {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    wordbookId: integer('wordbook_id')
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    wordbookId: integer("wordbook_id")
       .notNull()
       .references(() => wordbooks.id),
-    wordId: integer('word_id')
+    wordId: integer("word_id")
       .notNull()
       .references(() => words.id),
-    sortOrder: integer('sort_order').notNull(),
+    sortOrder: integer("sort_order").notNull(),
   },
   (table) => ({
-    wordbookWordUniq: uniqueIndex('uniq_wordbook_words').on(table.wordbookId, table.wordId),
-  }),
-)
+    wordbookWordUniq: uniqueIndex("uniq_wordbook_words").on(
+      table.wordbookId,
+      table.wordId
+    ),
+  })
+);
 ```
 
 - [ ] **Step 2: 创建数据库实例**
 
 ```typescript
 // packages/server/src/models/index.ts
-import * as schema from './schema'
-import Database from 'better-sqlite3'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
-import path from 'path'
+import * as schema from "./schema";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import path from "path";
 
-const DB_PATH = path.resolve(__dirname, '../../data/qwerty.db')
+const DB_PATH = path.resolve(__dirname, "../../data/qwerty.db");
 
-const sqlite = new Database(DB_PATH)
-sqlite.pragma('journal_mode = WAL')
+const sqlite = new Database(DB_PATH);
+sqlite.pragma("journal_mode = WAL");
 
-export const db = drizzle(sqlite, { schema })
-export { schema }
+export const db = drizzle(sqlite, { schema });
+export { schema };
 ```
 
 - [ ] **Step 3: 创建 Drizzle 配置文件**
 
 ```typescript
 // packages/server/drizzle.config.ts
-import { defineConfig } from 'drizzle-kit'
+import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: './src/models/schema.ts',
-  out: './drizzle',
-  dialect: 'sqlite',
+  schema: "./src/models/schema.ts",
+  out: "./drizzle",
+  dialect: "sqlite",
   dbCredentials: {
-    url: './data/qwerty.db',
+    url: "./data/qwerty.db",
   },
-})
+});
 ```
 
 - [ ] **Step 4: 生成并运行迁移**
@@ -537,76 +554,78 @@ git commit -m "feat(server): 定义 Drizzle schema 并初始化数据库
 
 ```typescript
 // packages/server/src/scripts/import-dicts.ts
-import * as schema from '../models/schema'
-import Database from 'better-sqlite3'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
-import * as fs from 'fs'
-import * as path from 'path'
+import * as schema from "../models/schema";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import * as fs from "fs";
+import * as path from "path";
 
 // 直接读取词典元数据 JSON（从前端资源提取一份静态 JSON）
-const DICTS_DIR = path.resolve(__dirname, '../../../web/public/dicts')
-const META_PATH = path.resolve(__dirname, '../scripts/dictionary-meta.json')
-const DB_PATH = path.resolve(__dirname, '../../data/qwerty.db')
+const DICTS_DIR = path.resolve(__dirname, "../../../web/public/dicts");
+const META_PATH = path.resolve(__dirname, "../scripts/dictionary-meta.json");
+const DB_PATH = path.resolve(__dirname, "../../data/qwerty.db");
 
 interface DictMeta {
-  id: string
-  name: string
-  description: string
-  category: string
-  tags: string[]
-  url: string
-  length: number
-  language: string
-  languageCategory: string
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  tags: string[];
+  url: string;
+  length: number;
+  language: string;
+  languageCategory: string;
 }
 
 interface WordJSON {
-  name: string
-  trans: string[]
-  usphone?: string
-  ukphone?: string
-  notation?: string
+  name: string;
+  trans: string[];
+  usphone?: string;
+  ukphone?: string;
+  notation?: string;
 }
 
 async function main() {
-  const sqlite = new Database(DB_PATH)
-  sqlite.pragma('journal_mode = WAL')
-  const db = drizzle(sqlite, { schema })
+  const sqlite = new Database(DB_PATH);
+  sqlite.pragma("journal_mode = WAL");
+  const db = drizzle(sqlite, { schema });
 
   // 读取词典元数据
-  const metas: DictMeta[] = JSON.parse(fs.readFileSync(META_PATH, 'utf-8'))
-  console.log(`Found ${metas.length} dictionaries to import`)
+  const metas: DictMeta[] = JSON.parse(fs.readFileSync(META_PATH, "utf-8"));
+  console.log(`Found ${metas.length} dictionaries to import`);
 
   // 清空现有数据
-  sqlite.exec('DELETE FROM wordbook_words')
-  sqlite.exec('DELETE FROM favorites')
-  sqlite.exec('DELETE FROM words')
-  sqlite.exec('DELETE FROM dictionaries')
+  sqlite.exec("DELETE FROM wordbook_words");
+  sqlite.exec("DELETE FROM favorites");
+  sqlite.exec("DELETE FROM words");
+  sqlite.exec("DELETE FROM dictionaries");
 
-  const now = Date.now()
-  let totalWords = 0
+  const now = Date.now();
+  let totalWords = 0;
 
   for (const meta of metas) {
-    const jsonFileName = meta.url.replace('/dicts/', '')
-    const jsonPath = path.join(DICTS_DIR, jsonFileName)
+    const jsonFileName = meta.url.replace("/dicts/", "");
+    const jsonPath = path.join(DICTS_DIR, jsonFileName);
 
     if (!fs.existsSync(jsonPath)) {
-      console.warn(`Skipping ${meta.id}: file not found at ${jsonPath}`)
-      continue
+      console.warn(`Skipping ${meta.id}: file not found at ${jsonPath}`);
+      continue;
     }
 
-    const wordsData: WordJSON[] = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'))
+    const wordsData: WordJSON[] = JSON.parse(
+      fs.readFileSync(jsonPath, "utf-8")
+    );
 
     // 使用事务批量插入
     const insertDict = sqlite.prepare(
       `INSERT INTO dictionaries (id, name, description, category, language, language_category, tags, word_count, user_id, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)`,
-    )
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)`
+    );
 
     const insertWord = sqlite.prepare(
       `INSERT INTO words (dict_id, name, trans, usphone, ukphone, notation, sort_order)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    )
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    );
 
     const transaction = sqlite.transaction(() => {
       insertDict.run(
@@ -619,25 +638,35 @@ async function main() {
         JSON.stringify(meta.tags),
         wordsData.length,
         now,
-        now,
-      )
+        now
+      );
 
       for (let i = 0; i < wordsData.length; i++) {
-        const word = wordsData[i]
-        insertWord.run(meta.id, word.name, JSON.stringify(word.trans), word.usphone || null, word.ukphone || null, word.notation || null, i)
+        const word = wordsData[i];
+        insertWord.run(
+          meta.id,
+          word.name,
+          JSON.stringify(word.trans),
+          word.usphone || null,
+          word.ukphone || null,
+          word.notation || null,
+          i
+        );
       }
-    })
+    });
 
-    transaction()
-    totalWords += wordsData.length
-    console.log(`  ✓ ${meta.id}: ${wordsData.length} words`)
+    transaction();
+    totalWords += wordsData.length;
+    console.log(`  ✓ ${meta.id}: ${wordsData.length} words`);
   }
 
-  console.log(`\nDone! Imported ${metas.length} dictionaries, ${totalWords} words total.`)
-  sqlite.close()
+  console.log(
+    `\nDone! Imported ${metas.length} dictionaries, ${totalWords} words total.`
+  );
+  sqlite.close();
 }
 
-main().catch(console.error)
+main().catch(console.error);
 ```
 
 - [ ] **Step 2: 从 dictionary.ts 提取元数据 JSON**
@@ -648,18 +677,20 @@ main().catch(console.error)
 // packages/server/src/scripts/extract-meta.ts
 // 读取 dictionary.ts 中的资源定义，输出为 JSON
 // 由于 dictionary.ts 是 TS 模块，使用 tsx 直接执行
-import * as fs from 'fs'
-import * as path from 'path'
+import * as fs from "fs";
+import * as path from "path";
 
 // 动态导入前端资源（需要配置 path alias 或用相对路径）
 // 这里直接硬编码读取并用正则提取，或者用更简单的方式：
 // 在 packages/web 中导出一份 JSON
 
-const outputPath = path.resolve(__dirname, './dictionary-meta.json')
+const outputPath = path.resolve(__dirname, "./dictionary-meta.json");
 
 async function main() {
   // 使用动态导入 + tsx 支持
-  const { dictionaryResources } = await import('../../../web/src/resources/dictionary')
+  const { dictionaryResources } = await import(
+    "../../../web/src/resources/dictionary"
+  );
   const meta = dictionaryResources.map((d) => ({
     id: d.id,
     name: d.name,
@@ -670,12 +701,14 @@ async function main() {
     length: d.length,
     language: d.language,
     languageCategory: d.languageCategory,
-  }))
-  fs.writeFileSync(outputPath, JSON.stringify(meta, null, 2))
-  console.log(`Extracted ${meta.length} dictionary metadata entries to ${outputPath}`)
+  }));
+  fs.writeFileSync(outputPath, JSON.stringify(meta, null, 2));
+  console.log(
+    `Extracted ${meta.length} dictionary metadata entries to ${outputPath}`
+  );
 }
 
-main().catch(console.error)
+main().catch(console.error);
 ```
 
 在 `packages/server/package.json` scripts 中添加：
@@ -742,17 +775,20 @@ git commit -m "feat(server): 添加词典数据导入脚本
 
 ```typescript
 // packages/server/src/services/dictionary.service.ts
-import { db, schema } from '../models'
-import { eq } from 'drizzle-orm'
+import { db, schema } from "../models";
+import { eq } from "drizzle-orm";
 
 export class DictionaryService {
   async findAll() {
-    return db.select().from(schema.dictionaries)
+    return db.select().from(schema.dictionaries);
   }
 
   async findById(id: string) {
-    const result = await db.select().from(schema.dictionaries).where(eq(schema.dictionaries.id, id))
-    return result[0] || null
+    const result = await db
+      .select()
+      .from(schema.dictionaries)
+      .where(eq(schema.dictionaries.id, id));
+    return result[0] || null;
   }
 }
 ```
@@ -761,30 +797,39 @@ export class DictionaryService {
 
 ```typescript
 // packages/server/src/services/word.service.ts
-import { db, schema } from '../models'
-import { eq, and, like, asc } from 'drizzle-orm'
+import { db, schema } from "../models";
+import { eq, and, like, asc } from "drizzle-orm";
 
-const DEFAULT_PAGE_SIZE = 20
+const DEFAULT_PAGE_SIZE = 20;
 
 export class WordService {
-  async findByChapter(dictId: string, chapter: number, pageSize: number = DEFAULT_PAGE_SIZE) {
-    const offset = chapter * pageSize
+  async findByChapter(
+    dictId: string,
+    chapter: number,
+    pageSize: number = DEFAULT_PAGE_SIZE
+  ) {
+    const offset = chapter * pageSize;
     return db
       .select()
       .from(schema.words)
       .where(eq(schema.words.dictId, dictId))
       .orderBy(asc(schema.words.sortOrder))
       .limit(pageSize)
-      .offset(offset)
+      .offset(offset);
   }
 
   async search(dictId: string, keyword: string) {
     return db
       .select()
       .from(schema.words)
-      .where(and(eq(schema.words.dictId, dictId), like(schema.words.name, `%${keyword}%`)))
+      .where(
+        and(
+          eq(schema.words.dictId, dictId),
+          like(schema.words.name, `%${keyword}%`)
+        )
+      )
       .orderBy(asc(schema.words.sortOrder))
-      .limit(50)
+      .limit(50);
   }
 }
 ```
@@ -793,32 +838,34 @@ export class WordService {
 
 ```typescript
 // packages/server/src/controllers/dictionary.controller.ts
-import { DictionaryService } from '../services/dictionary.service'
-import type { Request, Response, NextFunction } from 'express'
+import { DictionaryService } from "../services/dictionary.service";
+import type { Request, Response, NextFunction } from "express";
 
-const dictionaryService = new DictionaryService()
+const dictionaryService = new DictionaryService();
 
 export class DictionaryController {
   getAll = async (_req: Request, res: Response, next: NextFunction) => {
     try {
-      const dictionaries = await dictionaryService.findAll()
-      res.json({ success: true, data: dictionaries })
+      const dictionaries = await dictionaryService.findAll();
+      res.json({ success: true, data: dictionaries });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const dict = await dictionaryService.findById(req.params.id)
+      const dict = await dictionaryService.findById(req.params.id);
       if (!dict) {
-        return res.status(404).json({ success: false, message: 'Dictionary not found' })
+        return res
+          .status(404)
+          .json({ success: false, message: "Dictionary not found" });
       }
-      res.json({ success: true, data: dict })
+      res.json({ success: true, data: dict });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 }
 ```
 
@@ -826,47 +873,47 @@ export class DictionaryController {
 
 ```typescript
 // packages/server/src/controllers/word.controller.ts
-import { WordService } from '../services/word.service'
-import type { Request, Response, NextFunction } from 'express'
+import { WordService } from "../services/word.service";
+import type { Request, Response, NextFunction } from "express";
 
-const wordService = new WordService()
+const wordService = new WordService();
 
 export class WordController {
   getByChapter = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params
-      const chapter = parseInt(req.query.chapter as string) || 0
-      const pageSize = parseInt(req.query.pageSize as string) || 20
+      const { id } = req.params;
+      const chapter = parseInt(req.query.chapter as string) || 0;
+      const pageSize = parseInt(req.query.pageSize as string) || 20;
 
-      const words = await wordService.findByChapter(id, chapter, pageSize)
+      const words = await wordService.findByChapter(id, chapter, pageSize);
       // 解析 trans JSON 字符串为数组
       const parsed = words.map((w) => ({
         ...w,
         trans: JSON.parse(w.trans),
-      }))
-      res.json({ success: true, data: parsed })
+      }));
+      res.json({ success: true, data: parsed });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   search = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params
-      const keyword = (req.query.keyword as string) || ''
+      const { id } = req.params;
+      const keyword = (req.query.keyword as string) || "";
       if (!keyword.trim()) {
-        return res.json({ success: true, data: [] })
+        return res.json({ success: true, data: [] });
       }
-      const words = await wordService.search(id, keyword)
+      const words = await wordService.search(id, keyword);
       const parsed = words.map((w) => ({
         ...w,
         trans: JSON.parse(w.trans),
-      }))
-      res.json({ success: true, data: parsed })
+      }));
+      res.json({ success: true, data: parsed });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 }
 ```
 
@@ -874,23 +921,23 @@ export class WordController {
 
 ```typescript
 // packages/server/src/routes/index.ts
-import { DictionaryController } from '../controllers/dictionary.controller'
-import { WordController } from '../controllers/word.controller'
-import { Router } from 'express'
+import { DictionaryController } from "../controllers/dictionary.controller";
+import { WordController } from "../controllers/word.controller";
+import { Router } from "express";
 
-const router = Router()
-const dictionaryController = new DictionaryController()
-const wordController = new WordController()
+const router = Router();
+const dictionaryController = new DictionaryController();
+const wordController = new WordController();
 
 // 词典
-router.get('/dictionaries', dictionaryController.getAll)
-router.get('/dictionaries/:id', dictionaryController.getById)
+router.get("/dictionaries", dictionaryController.getAll);
+router.get("/dictionaries/:id", dictionaryController.getById);
 
 // 单词
-router.get('/dictionaries/:id/words', wordController.getByChapter)
-router.get('/dictionaries/:id/words/search', wordController.search)
+router.get("/dictionaries/:id/words", wordController.getByChapter);
+router.get("/dictionaries/:id/words/search", wordController.search);
 
-export { router }
+export { router };
 ```
 
 - [ ] **Step 6: 启动验证 API**
@@ -940,15 +987,18 @@ git commit -m "feat(server): 实现词典和单词 CRUD API
 
 ```typescript
 // packages/server/src/services/favorite.service.ts
-import { db, schema } from '../models'
-import { eq, and } from 'drizzle-orm'
+import { db, schema } from "../models";
+import { eq, and } from "drizzle-orm";
 
 export class FavoriteService {
   async findAll(dictId?: string) {
     if (dictId) {
-      return db.select().from(schema.favorites).where(eq(schema.favorites.dictId, dictId))
+      return db
+        .select()
+        .from(schema.favorites)
+        .where(eq(schema.favorites.dictId, dictId));
     }
-    return db.select().from(schema.favorites)
+    return db.select().from(schema.favorites);
   }
 
   async create(wordId: number, dictId: string) {
@@ -957,11 +1007,11 @@ export class FavoriteService {
       dictId,
       userId: null,
       createdAt: Date.now(),
-    })
+    });
   }
 
   async delete(id: number) {
-    return db.delete(schema.favorites).where(eq(schema.favorites.id, id))
+    return db.delete(schema.favorites).where(eq(schema.favorites.id, id));
   }
 }
 ```
@@ -970,12 +1020,12 @@ export class FavoriteService {
 
 ```typescript
 // packages/server/src/services/wordbook.service.ts
-import { db, schema } from '../models'
-import { eq } from 'drizzle-orm'
+import { db, schema } from "../models";
+import { eq } from "drizzle-orm";
 
 export class WordbookService {
   async findAll() {
-    return db.select().from(schema.wordbooks)
+    return db.select().from(schema.wordbooks);
   }
 
   async create(name: string, description?: string) {
@@ -985,20 +1035,22 @@ export class WordbookService {
       userId: null,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    })
+    });
   }
 
   async update(id: number, data: { name?: string; description?: string }) {
     return db
       .update(schema.wordbooks)
       .set({ ...data, updatedAt: Date.now() })
-      .where(eq(schema.wordbooks.id, id))
+      .where(eq(schema.wordbooks.id, id));
   }
 
   async delete(id: number) {
     // 先删除关联
-    await db.delete(schema.wordbookWords).where(eq(schema.wordbookWords.wordbookId, id))
-    return db.delete(schema.wordbooks).where(eq(schema.wordbooks.id, id))
+    await db
+      .delete(schema.wordbookWords)
+      .where(eq(schema.wordbookWords.wordbookId, id));
+    return db.delete(schema.wordbooks).where(eq(schema.wordbooks.id, id));
   }
 
   async getWords(wordbookId: number) {
@@ -1014,35 +1066,45 @@ export class WordbookService {
       })
       .from(schema.wordbookWords)
       .innerJoin(schema.words, eq(schema.wordbookWords.wordId, schema.words.id))
-      .where(eq(schema.wordbookWords.wordbookId, wordbookId))
+      .where(eq(schema.wordbookWords.wordbookId, wordbookId));
   }
 
   async addWord(wordbookId: number, wordId: number) {
     const existing = await db
       .select()
       .from(schema.wordbookWords)
-      .where(and(eq(schema.wordbookWords.wordbookId, wordbookId), eq(schema.wordbookWords.wordId, wordId)))
-    if (existing.length > 0) return existing[0]
+      .where(
+        and(
+          eq(schema.wordbookWords.wordbookId, wordbookId),
+          eq(schema.wordbookWords.wordId, wordId)
+        )
+      );
+    if (existing.length > 0) return existing[0];
 
     // 获取当前最大 sortOrder
     const maxSort = await db
       .select({ max: schema.wordbookWords.sortOrder })
       .from(schema.wordbookWords)
-      .where(eq(schema.wordbookWords.wordbookId, wordbookId))
+      .where(eq(schema.wordbookWords.wordbookId, wordbookId));
 
-    const sortOrder = (maxSort[0]?.max || 0) + 1
+    const sortOrder = (maxSort[0]?.max || 0) + 1;
 
     return db.insert(schema.wordbookWords).values({
       wordbookId,
       wordId,
       sortOrder,
-    })
+    });
   }
 
   async removeWord(wordbookId: number, wordId: number) {
     return db
       .delete(schema.wordbookWords)
-      .where(and(eq(schema.wordbookWords.wordbookId, wordbookId), eq(schema.wordbookWords.wordId, wordId)))
+      .where(
+        and(
+          eq(schema.wordbookWords.wordbookId, wordbookId),
+          eq(schema.wordbookWords.wordId, wordId)
+        )
+      );
   }
 }
 ```
@@ -1051,44 +1113,46 @@ export class WordbookService {
 
 ```typescript
 // packages/server/src/controllers/favorite.controller.ts
-import { FavoriteService } from '../services/favorite.service'
-import type { Request, Response, NextFunction } from 'express'
+import { FavoriteService } from "../services/favorite.service";
+import type { Request, Response, NextFunction } from "express";
 
-const favoriteService = new FavoriteService()
+const favoriteService = new FavoriteService();
 
 export class FavoriteController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const dictId = req.query.dictId as string | undefined
-      const favorites = await favoriteService.findAll(dictId)
-      res.json({ success: true, data: favorites })
+      const dictId = req.query.dictId as string | undefined;
+      const favorites = await favoriteService.findAll(dictId);
+      res.json({ success: true, data: favorites });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { wordId, dictId } = req.body
+      const { wordId, dictId } = req.body;
       if (!wordId || !dictId) {
-        return res.status(400).json({ success: false, message: 'wordId and dictId are required' })
+        return res
+          .status(400)
+          .json({ success: false, message: "wordId and dictId are required" });
       }
-      await favoriteService.create(wordId, dictId)
-      res.status(201).json({ success: true })
+      await favoriteService.create(wordId, dictId);
+      res.status(201).json({ success: true });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = parseInt(req.params.id)
-      await favoriteService.delete(id)
-      res.json({ success: true })
+      const id = parseInt(req.params.id);
+      await favoriteService.delete(id);
+      res.json({ success: true });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 }
 ```
 
@@ -1096,90 +1160,94 @@ export class FavoriteController {
 
 ```typescript
 // packages/server/src/controllers/wordbook.controller.ts
-import { WordbookService } from '../services/wordbook.service'
-import type { Request, Response, NextFunction } from 'express'
+import { WordbookService } from "../services/wordbook.service";
+import type { Request, Response, NextFunction } from "express";
 
-const wordbookService = new WordbookService()
+const wordbookService = new WordbookService();
 
 export class WordbookController {
   getAll = async (_req: Request, res: Response, next: NextFunction) => {
     try {
-      const wordbooks = await wordbookService.findAll()
-      res.json({ success: true, data: wordbooks })
+      const wordbooks = await wordbookService.findAll();
+      res.json({ success: true, data: wordbooks });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, description } = req.body
+      const { name, description } = req.body;
       if (!name) {
-        return res.status(400).json({ success: false, message: 'name is required' })
+        return res
+          .status(400)
+          .json({ success: false, message: "name is required" });
       }
-      await wordbookService.create(name, description)
-      res.status(201).json({ success: true })
+      await wordbookService.create(name, description);
+      res.status(201).json({ success: true });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = parseInt(req.params.id)
-      const { name, description } = req.body
-      await wordbookService.update(id, { name, description })
-      res.json({ success: true })
+      const id = parseInt(req.params.id);
+      const { name, description } = req.body;
+      await wordbookService.update(id, { name, description });
+      res.json({ success: true });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = parseInt(req.params.id)
-      await wordbookService.delete(id)
-      res.json({ success: true })
+      const id = parseInt(req.params.id);
+      await wordbookService.delete(id);
+      res.json({ success: true });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   getWords = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const wordbookId = parseInt(req.params.id)
-      const words = await wordbookService.getWords(wordbookId)
-      const parsed = words.map((w) => ({ ...w, trans: JSON.parse(w.trans) }))
-      res.json({ success: true, data: parsed })
+      const wordbookId = parseInt(req.params.id);
+      const words = await wordbookService.getWords(wordbookId);
+      const parsed = words.map((w) => ({ ...w, trans: JSON.parse(w.trans) }));
+      res.json({ success: true, data: parsed });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   addWord = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const wordbookId = parseInt(req.params.id)
-      const { wordId } = req.body
+      const wordbookId = parseInt(req.params.id);
+      const { wordId } = req.body;
       if (!wordId) {
-        return res.status(400).json({ success: false, message: 'wordId is required' })
+        return res
+          .status(400)
+          .json({ success: false, message: "wordId is required" });
       }
-      await wordbookService.addWord(wordbookId, wordId)
-      res.status(201).json({ success: true })
+      await wordbookService.addWord(wordbookId, wordId);
+      res.status(201).json({ success: true });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 
   removeWord = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const wordbookId = parseInt(req.params.id)
-      const wordId = parseInt(req.params.wordId)
-      await wordbookService.removeWord(wordbookId, wordId)
-      res.json({ success: true })
+      const wordbookId = parseInt(req.params.id);
+      const wordId = parseInt(req.params.wordId);
+      await wordbookService.removeWord(wordbookId, wordId);
+      res.json({ success: true });
     } catch (err) {
-      next(err)
+      next(err);
     }
-  }
+  };
 }
 ```
 
@@ -1188,25 +1256,25 @@ export class WordbookController {
 在 `packages/server/src/routes/index.ts` 追加：
 
 ```typescript
-import { FavoriteController } from '../controllers/favorite.controller'
-import { WordbookController } from '../controllers/wordbook.controller'
+import { FavoriteController } from "../controllers/favorite.controller";
+import { WordbookController } from "../controllers/wordbook.controller";
 
-const favoriteController = new FavoriteController()
-const wordbookController = new WordbookController()
+const favoriteController = new FavoriteController();
+const wordbookController = new WordbookController();
 
 // 收藏
-router.get('/favorites', favoriteController.getAll)
-router.post('/favorites', favoriteController.create)
-router.delete('/favorites/:id', favoriteController.delete)
+router.get("/favorites", favoriteController.getAll);
+router.post("/favorites", favoriteController.create);
+router.delete("/favorites/:id", favoriteController.delete);
 
 // 自定义词库
-router.get('/wordbooks', wordbookController.getAll)
-router.post('/wordbooks', wordbookController.create)
-router.put('/wordbooks/:id', wordbookController.update)
-router.delete('/wordbooks/:id', wordbookController.delete)
-router.get('/wordbooks/:id/words', wordbookController.getWords)
-router.post('/wordbooks/:id/words', wordbookController.addWord)
-router.delete('/wordbooks/:id/words/:wordId', wordbookController.removeWord)
+router.get("/wordbooks", wordbookController.getAll);
+router.post("/wordbooks", wordbookController.create);
+router.put("/wordbooks/:id", wordbookController.update);
+router.delete("/wordbooks/:id", wordbookController.delete);
+router.get("/wordbooks/:id/words", wordbookController.getWords);
+router.post("/wordbooks/:id/words", wordbookController.addWord);
+router.delete("/wordbooks/:id/words/:wordId", wordbookController.removeWord);
 ```
 
 - [ ] **Step 6: 验证收藏和词库 API**
@@ -1279,46 +1347,51 @@ cd packages/web && pnpm add axios
 
 ```typescript
 // packages/web/src/utils/api.ts
-import axios from 'axios'
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: "/api/v1",
   timeout: 10000,
-})
+});
 
-export { api }
+export { api };
 ```
 
 - [ ] **Step 3: 改造 wordListFetcher 支持双数据源**
 
 ```typescript
 // packages/web/src/utils/wordListFetcher.ts
-import { api } from './api'
-import type { Word } from '@/typings'
+import { api } from "./api";
+import type { Word } from "@/typings";
 
-const REACT_APP_DEPLOY_ENV = import.meta.env.REACT_APP_DEPLOY_ENV || ''
-const USE_API = import.meta.env.VITE_USE_API === 'true'
+const REACT_APP_DEPLOY_ENV = import.meta.env.REACT_APP_DEPLOY_ENV || "";
+const USE_API = import.meta.env.VITE_USE_API === "true";
 
 /**
  * 从后端 API 获取单词（按章节）
  */
-async function fetchFromAPI(dictId: string, chapter: number, pageSize: number = 20): Promise<Word[]> {
+async function fetchFromAPI(
+  dictId: string,
+  chapter: number,
+  pageSize: number = 20
+): Promise<Word[]> {
   const res = await api.get(`/dictionaries/${dictId}/words`, {
     params: { chapter, pageSize },
-  })
-  return res.data.data
+  });
+  return res.data.data;
 }
 
 /**
  * 从静态 JSON 文件获取完整词典（原始方式）
  */
 async function fetchFromJSON(url: string): Promise<Word[]> {
-  const URL_PREFIX: string = REACT_APP_DEPLOY_ENV === 'pages' ? '/qwerty-learner' : ''
-  const response = await fetch(URL_PREFIX + url)
-  return response.json()
+  const URL_PREFIX: string =
+    REACT_APP_DEPLOY_ENV === "pages" ? "/qwerty-learner" : "";
+  const response = await fetch(URL_PREFIX + url);
+  return response.json();
 }
 
-export { fetchFromAPI, fetchFromJSON, USE_API }
+export { fetchFromAPI, fetchFromJSON, USE_API };
 ```
 
 - [ ] **Step 4: 改造 useWordList hook**
@@ -1331,15 +1404,19 @@ export { fetchFromAPI, fetchFromJSON, USE_API }
 核心改动点：
 
 ```typescript
-import { fetchFromAPI, fetchFromJSON, USE_API } from '@/utils/wordListFetcher'
+import { fetchFromAPI, fetchFromJSON, USE_API } from "@/utils/wordListFetcher";
 
 // API 模式下的 SWR 调用
-const { data: apiWords } = useSWR(USE_API ? ['words', currentDictInfo.id, currentChapter] : null, ([, dictId, chapter]) =>
-  fetchFromAPI(dictId, chapter),
-)
+const { data: apiWords } = useSWR(
+  USE_API ? ["words", currentDictInfo.id, currentChapter] : null,
+  ([, dictId, chapter]) => fetchFromAPI(dictId, chapter)
+);
 
 // JSON 模式保持原逻辑
-const { data: jsonWordList } = useSWR(!USE_API ? currentDictInfo.url : null, fetchFromJSON)
+const { data: jsonWordList } = useSWR(
+  !USE_API ? currentDictInfo.url : null,
+  fetchFromJSON
+);
 ```
 
 - [ ] **Step 5: 添加环境变量**

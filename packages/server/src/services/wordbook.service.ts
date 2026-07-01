@@ -64,9 +64,7 @@ export class WordbookService {
       .where(eq(schema.wordbookWords.wordbookId, wordbookId));
 
     const maxSort =
-      allWords.length > 0
-        ? Math.max(...allWords.map((w) => w.sortOrder))
-        : 0;
+      allWords.length > 0 ? Math.max(...allWords.map((w) => w.sortOrder)) : 0;
     const sortOrder = maxSort + 1;
 
     return db.insert(schema.wordbookWords).values({

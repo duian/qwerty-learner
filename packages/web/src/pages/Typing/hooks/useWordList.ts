@@ -32,9 +32,8 @@ export function useWordList(): UseWordListResult {
     data: apiWords,
     error: apiError,
     isLoading: apiLoading,
-  } = useSWR(
-    USE_API && !isReviewMode && !isFirstChapter ? ['words', currentDictInfo.id, currentChapter] : null,
-    ([, dictId, chapter]) => fetchFromAPI(dictId as string, chapter as number),
+  } = useSWR(USE_API && !isReviewMode && !isFirstChapter ? ['words', currentDictInfo.id, currentChapter] : null, ([, dictId, chapter]) =>
+    fetchFromAPI(dictId as string, chapter as number),
   )
 
   // JSON mode: fetch the full dictionary and slice client-side (original behaviour).

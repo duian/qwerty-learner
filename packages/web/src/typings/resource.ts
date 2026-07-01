@@ -1,5 +1,5 @@
-import type { LanguageType } from '@qwerty-learner/shared'
 import type { PronunciationType } from '.'
+import type { LanguageType } from '@qwerty-learner/shared'
 
 export type PronunciationConfig = {
   name: string

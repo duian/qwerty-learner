@@ -133,10 +133,7 @@
       "indexes": {
         "uniq_favorites_user_word": {
           "name": "uniq_favorites_user_word",
-          "columns": [
-            "user_id",
-            "word_id"
-          ],
+          "columns": ["user_id", "word_id"],
           "isUnique": true
         }
       },
@@ -145,12 +142,8 @@
           "name": "favorites_word_id_words_id_fk",
           "tableFrom": "favorites",
           "tableTo": "words",
-          "columnsFrom": [
-            "word_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["word_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -194,10 +187,7 @@
       "indexes": {
         "uniq_wordbook_words": {
           "name": "uniq_wordbook_words",
-          "columns": [
-            "wordbook_id",
-            "word_id"
-          ],
+          "columns": ["wordbook_id", "word_id"],
           "isUnique": true
         }
       },
@@ -206,12 +196,8 @@
           "name": "wordbook_words_wordbook_id_wordbooks_id_fk",
           "tableFrom": "wordbook_words",
           "tableTo": "wordbooks",
-          "columnsFrom": [
-            "wordbook_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["wordbook_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -219,12 +205,8 @@
           "name": "wordbook_words_word_id_words_id_fk",
           "tableFrom": "wordbook_words",
           "tableTo": "words",
-          "columnsFrom": [
-            "word_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["word_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -348,10 +330,7 @@
       "indexes": {
         "idx_words_dict_sort": {
           "name": "idx_words_dict_sort",
-          "columns": [
-            "dict_id",
-            "sort_order"
-          ],
+          "columns": ["dict_id", "sort_order"],
           "isUnique": false
         }
       },
@@ -360,12 +339,8 @@
           "name": "words_dict_id_dictionaries_id_fk",
           "tableFrom": "words",
           "tableTo": "dictionaries",
-          "columnsFrom": [
-            "dict_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["dict_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
