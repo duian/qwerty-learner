@@ -1,14 +1,21 @@
 {
   "name": "qwerty-learner",
   "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=18.17.0"
+  },
   "scripts": {
     "dev": "pnpm --parallel -r run dev",
     "dev:web": "pnpm --filter @qwerty-learner/web dev",
     "dev:server": "pnpm --filter @qwerty-learner/server dev",
     "build": "pnpm -r run build",
+    "build:web": "pnpm --filter @qwerty-learner/web build",
+    "build:server": "pnpm --filter @qwerty-learner/server build",
     "lint": "pnpm --filter @qwerty-learner/web lint",
     "prettier": "prettier --write .",
-    "import-dicts": "pnpm --filter @qwerty-learner/server import-dicts"
+    "import-dicts": "pnpm --filter @qwerty-learner/server import-dicts",
+    "typecheck": "tsc --build"
   },
   "devDependencies": {
     "prettier": "^2.8.8",
