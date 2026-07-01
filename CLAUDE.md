@@ -9,11 +9,17 @@ Qwerty Learner — a keyboard-based typing practice and vocabulary memorization 
 ## Commands
 
 ```bash
-yarn dev          # Start dev server (Vite, localhost:5173)
-yarn build        # Production build (output: build/)
-yarn lint         # ESLint check
-yarn prettier     # Format all files
-yarn test:e2e     # Playwright end-to-end tests
+pnpm install        # Install all workspace dependencies
+pnpm dev            # Start all packages in dev mode (parallel)
+pnpm dev:web        # Start web dev server only (localhost:5173)
+pnpm dev:server     # Start API server only (localhost:3001)
+pnpm build          # Production build all packages
+pnpm build:web      # Build web package only (output: packages/web/build/)
+pnpm build:server   # Build server package only (output: packages/server/dist/)
+pnpm lint           # ESLint check (web package)
+pnpm prettier       # Format all files
+pnpm typecheck      # Type-check all packages via project references
+pnpm import-dicts   # Import dictionary data into server DB
 ```
 
 No unit test framework is configured. Pre-commit hooks (Husky) run lint-staged → eslint --fix → prettier on every commit.
