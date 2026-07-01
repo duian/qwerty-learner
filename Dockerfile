@@ -3,12 +3,13 @@ FROM node:20 AS build
 WORKDIR /app
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 # Copy workspace config first for layer caching
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc ./
 COPY packages/web/package.json packages/web/
 COPY packages/shared/package.json packages/shared/
+COPY packages/server/package.json packages/server/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile

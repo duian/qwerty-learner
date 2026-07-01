@@ -12,7 +12,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 9.15.0
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -24,7 +24,6 @@ jobs:
         run: pnpm --filter @qwerty-learner/web exec playwright install --with-deps
       - name: Run E2E tests
         run: pnpm --filter @qwerty-learner/web test:e2e
-        continue-on-error: true
       - uses: actions/upload-artifact@v4
         with:
           name: playwright-report
