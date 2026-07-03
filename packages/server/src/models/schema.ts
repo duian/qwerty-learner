@@ -86,3 +86,60 @@ export const wordbookWords = sqliteTable(
     ),
   })
 );
+
+export const wordRecords = sqliteTable(
+  "word_records",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    word: text("word").notNull(),
+    dict: text("dict").notNull(),
+    chapter: integer("chapter"),
+    timing: text("timing").notNull(), // JSON array of numbers
+    wrongCount: integer("wrong_count").notNull().default(0),
+    mistakes: text("mistakes").notNull().default("{}"), // JSON object
+    timeStamp: integer("time_stamp").notNull(),
+    userId: text("user_id"),
+  },
+  (table) => ({
+    dictChapterIdx: index("idx_word_records_dict_chapter").on(table.dict, table.chapter),
+    wrongCountIdx: index("idx_word_records_wrong_count").on(table.wrongCount),
+    wordDictIdx: index("idx_word_records_word_dict").on(table.word, table.dict),
+  })
+);
+
+export const chapterRecords = sqliteTable(
+  "chapter_records",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    dict: text("dict").notNull(),
+    chapter: integer("chapter"),
+    timeStamp: integer("time_stamp").notNull(),
+    time: integer("time").notNull(), // seconds spent
+    correctCount: integer("correct_count").notNull().default(0),
+    wrongCount: integer("wrong_count").notNull().default(0),
+    wordCount: integer("word_count").notNull().default(0),
+    wordNumber: integer("word_number").notNull().default(0),
+    correctWordIndexes: text("correct_word_indexes").notNull().default("[]"), // JSON array
+    wordRecordIds: text("word_record_ids").notNull().default("[]"), // JSON array
+    userId: text("user_id"),
+  },
+  (table) => ({
+    dictChapterIdx: index("idx_chapter_records_dict_chapter").on(table.dict, table.chapter),
+  })
+);
+
+export const reviewRecords = sqliteTable(
+  "review_records",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    dict: text("dict").notNull(),
+    index: integer("index").notNull().default(0),
+    createTime: integer("create_time").notNull(),
+    isFinished: integer("is_finished", { mode: "boolean" }).notNull().default(false),
+    words: text("words").notNull().default("[]"), // JSON array of Word objects
+    userId: text("user_id"),
+  },
+  (table) => ({
+    dictFinishedIdx: index("idx_review_records_dict_finished").on(table.dict, table.isFinished),
+  })
+);
