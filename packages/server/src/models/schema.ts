@@ -101,7 +101,10 @@ export const wordRecords = sqliteTable(
     userId: text("user_id"),
   },
   (table) => ({
-    dictChapterIdx: index("idx_word_records_dict_chapter").on(table.dict, table.chapter),
+    dictChapterIdx: index("idx_word_records_dict_chapter").on(
+      table.dict,
+      table.chapter
+    ),
     wrongCountIdx: index("idx_word_records_wrong_count").on(table.wrongCount),
     wordDictIdx: index("idx_word_records_word_dict").on(table.word, table.dict),
   })
@@ -124,7 +127,10 @@ export const chapterRecords = sqliteTable(
     userId: text("user_id"),
   },
   (table) => ({
-    dictChapterIdx: index("idx_chapter_records_dict_chapter").on(table.dict, table.chapter),
+    dictChapterIdx: index("idx_chapter_records_dict_chapter").on(
+      table.dict,
+      table.chapter
+    ),
   })
 );
 
@@ -135,11 +141,16 @@ export const reviewRecords = sqliteTable(
     dict: text("dict").notNull(),
     index: integer("index").notNull().default(0),
     createTime: integer("create_time").notNull(),
-    isFinished: integer("is_finished", { mode: "boolean" }).notNull().default(false),
+    isFinished: integer("is_finished", { mode: "boolean" })
+      .notNull()
+      .default(false),
     words: text("words").notNull().default("[]"), // JSON array of Word objects
     userId: text("user_id"),
   },
   (table) => ({
-    dictFinishedIdx: index("idx_review_records_dict_finished").on(table.dict, table.isFinished),
+    dictFinishedIdx: index("idx_review_records_dict_finished").on(
+      table.dict,
+      table.isFinished
+    ),
   })
 );

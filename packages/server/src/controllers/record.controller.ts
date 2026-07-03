@@ -114,13 +114,28 @@ export class RecordController {
     }
   };
 
-  getWordRecordsByTimeRange = async (req: Request, res: Response, next: NextFunction) => {
+  getWordRecordsByTimeRange = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      const { startTimeStamp, endTimeStamp } = req.query as { startTimeStamp?: string; endTimeStamp?: string };
+      const { startTimeStamp, endTimeStamp } = req.query as {
+        startTimeStamp?: string;
+        endTimeStamp?: string;
+      };
       if (!startTimeStamp || !endTimeStamp) {
-        return res.status(400).json({ success: false, message: "startTimeStamp and endTimeStamp are required" });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "startTimeStamp and endTimeStamp are required",
+          });
       }
-      const records = await recordService.getWordRecordsByTimeRange(Number(startTimeStamp), Number(endTimeStamp));
+      const records = await recordService.getWordRecordsByTimeRange(
+        Number(startTimeStamp),
+        Number(endTimeStamp)
+      );
       res.json({ success: true, data: records });
     } catch (err) {
       next(err);
@@ -139,7 +154,11 @@ export class RecordController {
     }
   };
 
-  getFirstWordRecord = async (req: Request, res: Response, next: NextFunction) => {
+  getFirstWordRecord = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const record = await recordService.getFirstWordRecord();
       res.json({ success: true, data: record });
@@ -148,7 +167,11 @@ export class RecordController {
     }
   };
 
-  getTotalWrongCount = async (req: Request, res: Response, next: NextFunction) => {
+  getTotalWrongCount = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const totalWrongCount = await recordService.getTotalWrongCount();
       res.json({ success: true, data: { totalWrongCount } });
@@ -157,11 +180,17 @@ export class RecordController {
     }
   };
 
-  getRevisionWordCount = async (req: Request, res: Response, next: NextFunction) => {
+  getRevisionWordCount = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const dict = req.query.dict as string | undefined;
       if (!dict) {
-        return res.status(400).json({ success: false, message: "dict is required" });
+        return res
+          .status(400)
+          .json({ success: false, message: "dict is required" });
       }
       const wordCount = await recordService.getRevisionWordCount(dict);
       res.json({ success: true, data: { wordCount } });
@@ -170,7 +199,11 @@ export class RecordController {
     }
   };
 
-  exportAllRecords = async (req: Request, res: Response, next: NextFunction) => {
+  exportAllRecords = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const [wordRecords, chapterRecords] = await Promise.all([
         recordService.getAllWordRecords(),

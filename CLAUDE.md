@@ -35,6 +35,7 @@ pnpm import-dicts   # Import dictionary JSON data into server DB
 ```
 
 Server-specific (run from `packages/server/`):
+
 ```bash
 pnpm db:generate    # Generate Drizzle migrations
 pnpm db:push        # Push schema to DB
@@ -64,6 +65,7 @@ Important: `isOpenDarkModeAtom` is a derived writable atom — pass explicit boo
 #### Keyboard Shortcuts
 
 Uses `react-hotkeys-hook`:
+
 - Hotkeys during active typing need `{ enableOnFormTags: true }`.
 - Hotkeys that should NOT fire during typing: `{ enabled: !state.isTyping }`.
 - Arrow key navigation uses modifier keys (Ctrl+Shift+Arrow) during typing, bare arrows only when not typing.
@@ -91,6 +93,7 @@ Express API on port 3001. SQLite database via Drizzle ORM (`data/qwerty.db`).
 **Tables**: `dictionaries`, `words`, `favorites`, `wordbooks`, `wordbookWords`
 
 **API routes** (all under `/api`):
+
 - `GET /dictionaries` — list all dictionaries
 - `GET /dictionaries/:id/words` — paginated words by chapter
 - `GET/POST/DELETE /favorites` — favorites CRUD
@@ -111,7 +114,7 @@ Express API on port 3001. SQLite database via Drizzle ORM (`data/qwerty.db`).
 | Local DB      | Dexie (IndexedDB)                          |
 | Hotkeys       | react-hotkeys-hook                         |
 | Animations    | animate.css, canvas-confetti               |
-| Server DB     | Drizzle ORM + better-sqlite3              |
+| Server DB     | Drizzle ORM + better-sqlite3               |
 | Server        | Express                                    |
 
 ### ESLint Rules

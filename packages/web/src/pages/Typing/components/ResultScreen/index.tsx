@@ -2,6 +2,7 @@ import { TypingContext, TypingStateActionType } from '../../store'
 import ConclusionBar from './ConclusionBar'
 import RemarkRing from './RemarkRing'
 import WordChip from './WordChip'
+import { deleteWordRecord as apiDeleteWordRecord } from '@/api/record-api'
 import Tooltip from '@/components/Tooltip'
 import {
   currentChapterAtom,
@@ -11,7 +12,6 @@ import {
   reviewModeInfoAtom,
   wordDictationConfigAtom,
 } from '@/store'
-import { deleteWordRecord as apiDeleteWordRecord } from '@/api/record-api'
 import { Transition } from '@headlessui/react'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react'

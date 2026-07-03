@@ -133,7 +133,10 @@ export class RecordService {
     return result[0].id;
   }
 
-  async getWordRecordsByTimeRange(startTimeStamp: number, endTimeStamp: number) {
+  async getWordRecordsByTimeRange(
+    startTimeStamp: number,
+    endTimeStamp: number
+  ) {
     const rows = await db
       .select()
       .from(wordRecords)

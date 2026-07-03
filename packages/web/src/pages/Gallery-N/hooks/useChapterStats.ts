@@ -1,5 +1,5 @@
-import { toFixedNumber } from '@/utils'
 import { fetchChapterRecords } from '@/api/record-api'
+import { toFixedNumber } from '@/utils'
 import type { IChapterRecord } from '@/utils/db/record'
 import { useEffect, useState } from 'react'
 

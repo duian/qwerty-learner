@@ -1,6 +1,6 @@
+import { fetchWordErrors } from '@/api/record-api'
 import { idDictionaryMap } from '@/resources/dictionary'
 import type { Word } from '@/typings'
-import { fetchWordErrors } from '@/api/record-api'
 import { wordListFetcher } from '@/utils/wordListFetcher'
 import { useCallback, useState } from 'react'
 

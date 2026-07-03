@@ -52,7 +52,10 @@ router.get("/records/word/range", recordController.getWordRecordsByTimeRange);
 router.get("/records/counts", recordController.getRecordCounts);
 router.get("/records/word/first", recordController.getFirstWordRecord);
 router.get("/records/chapter/total-wrong", recordController.getTotalWrongCount);
-router.get("/records/word/revision-count", recordController.getRevisionWordCount);
+router.get(
+  "/records/word/revision-count",
+  recordController.getRevisionWordCount
+);
 router.get("/records/export", recordController.exportAllRecords);
 
 export { router };

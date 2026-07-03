@@ -1,5 +1,5 @@
-import { currentDictIdAtom } from '@/store'
 import { fetchChapterRecords } from '@/api/record-api'
+import { currentDictIdAtom } from '@/store'
 import type { IChapterRecord } from '@/utils/db/record'
 import { useAtomValue } from 'jotai'
 import { useEffect, useState } from 'react'

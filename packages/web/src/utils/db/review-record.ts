@@ -1,8 +1,8 @@
+import { ReviewRecord } from './record'
 import { fetchLatestReview, postReviewRecord } from '@/api/record-api'
 import type { TErrorWordData } from '@/pages/Gallery-N/hooks/useErrorWords'
 import type { Word } from '@/typings'
 import { getUTCUnixTimestamp } from '@/utils'
-import { ReviewRecord } from './record'
 import { useEffect, useState } from 'react'
 
 export function useGetLatestReviewRecord(dictID: string) {
