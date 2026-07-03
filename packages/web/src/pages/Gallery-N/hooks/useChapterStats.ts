@@ -1,5 +1,5 @@
 import { toFixedNumber } from '@/utils'
-import { db } from '@/utils/db'
+import { fetchChapterRecords } from '@/api/record-api'
 import type { IChapterRecord } from '@/utils/db/record'
 import { useEffect, useState } from 'react'
 
@@ -28,7 +28,7 @@ interface IChapterStats {
 }
 
 async function getChapterStats(dict: string, chapter: number | null): Promise<IChapterStats> {
-  const records: IChapterRecord[] = await db.chapterRecords.where({ dict, chapter }).toArray()
+  const records: IChapterRecord[] = await fetchChapterRecords(dict, chapter ?? undefined)
 
   const exerciseCount = records.length
   const totalWrongWordCount = records.reduce(

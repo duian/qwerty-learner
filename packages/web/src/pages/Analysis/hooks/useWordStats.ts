@@ -1,4 +1,4 @@
-import { db } from '@/utils/db'
+import { fetchWordRecordsByTimeRange } from '@/api/record-api'
 import type { IWordRecord } from '@/utils/db/record'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
@@ -57,8 +57,8 @@ export function useWordStats(startTimeStamp: number, endTimeStamp: number) {
 }
 
 async function getChapterStats(startTimeStamp: number, endTimeStamp: number): Promise<IWordStats> {
-  // indexedDB查找某个数字范围内的数据
-  const records: IWordRecord[] = await db.wordRecords.where('timeStamp').between(startTimeStamp, endTimeStamp).toArray()
+  // Fetch word records within the timestamp range via API
+  const records: IWordRecord[] = await fetchWordRecordsByTimeRange(startTimeStamp, endTimeStamp)
 
   if (records.length === 0) {
     return { isEmpty: true, exerciseRecord: [], wordRecord: [], wpmRecord: [], accuracyRecord: [], wrongTimeRecord: [] }

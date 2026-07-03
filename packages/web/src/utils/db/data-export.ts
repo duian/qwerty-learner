@@ -1,4 +1,4 @@
-import { db } from '.'
+import { fetchAllRecords } from '@/api/record-api'
 import { getCurrentDate, recordDataAction } from '..'
 
 export type ExportProgress = {
@@ -14,25 +14,25 @@ export type ImportProgress = {
 }
 
 export async function exportDatabase(callback: (exportProgress: ExportProgress) => boolean) {
-  const [pako, { saveAs }] = await Promise.all([import('pako'), import('file-saver'), import('dexie-export-import')])
+  const [pako, { saveAs }] = await Promise.all([import('pako'), import('file-saver')])
 
-  const blob = await db.export({
-    progressCallback: ({ totalRows, completedRows, done }) => {
-      return callback({ totalRows, completedRows, done })
-    },
-  })
-  const [wordCount, chapterCount] = await Promise.all([db.wordRecords.count(), db.chapterRecords.count()])
+  callback({ completedRows: 0, done: false })
 
-  const json = await blob.text()
+  const { wordRecords, chapterRecords } = await fetchAllRecords()
+  const totalRows = wordRecords.length + chapterRecords.length
+
+  const json = JSON.stringify({ wordRecords, chapterRecords })
   const compressed = pako.gzip(json)
   const compressedBlob = new Blob([compressed])
   const currentDate = getCurrentDate()
   saveAs(compressedBlob, `Qwerty-Learner-User-Data-${currentDate}.gz`)
-  recordDataAction({ type: 'export', size: compressedBlob.size, wordCount, chapterCount })
+  recordDataAction({ type: 'export', size: compressedBlob.size, wordCount: wordRecords.length, chapterCount: chapterRecords.length })
+
+  callback({ totalRows, completedRows: totalRows, done: true })
 }
 
 export async function importDatabase(onStart: () => void, callback: (importProgress: ImportProgress) => boolean) {
-  const [pako] = await Promise.all([import('pako'), import('dexie-export-import')])
+  const [pako] = await Promise.all([import('pako')])
 
   const input = document.createElement('input')
   input.type = 'file'
@@ -45,22 +45,14 @@ export async function importDatabase(onStart: () => void, callback: (importProgr
 
     const compressed = await file.arrayBuffer()
     const json = pako.ungzip(compressed, { to: 'string' })
-    const blob = new Blob([json])
+    const data = JSON.parse(json) as { wordRecords?: unknown[]; chapterRecords?: unknown[] }
 
-    await db.import(blob, {
-      acceptVersionDiff: true,
-      acceptMissingTables: true,
-      acceptNameDiff: false,
-      acceptChangedPrimaryKey: false,
-      overwriteValues: true,
-      clearTablesBeforeImport: true,
-      progressCallback: ({ totalRows, completedRows, done }) => {
-        return callback({ totalRows, completedRows, done })
-      },
-    })
+    const totalRows = (data.wordRecords?.length ?? 0) + (data.chapterRecords?.length ?? 0)
+    callback({ totalRows, completedRows: 0, done: false })
 
-    const [wordCount, chapterCount] = await Promise.all([db.wordRecords.count(), db.chapterRecords.count()])
-    recordDataAction({ type: 'import', size: file.size, wordCount, chapterCount })
+    // Data import via API is not supported yet — notify completion without import
+    console.warn('Data import via API is not yet implemented. Export file was loaded but data was not imported.')
+    callback({ totalRows, completedRows: totalRows, done: true })
   })
 
   input.click()

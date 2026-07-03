@@ -1,4 +1,4 @@
-import { db } from '@/utils/db'
+import { fetchFirstWordRecord, fetchRecordCounts, fetchTotalWrongCount } from '@/api/record-api'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 
@@ -7,8 +7,8 @@ export function useChapterNumber() {
 
   useEffect(() => {
     const fetchChapterNumber = async () => {
-      const number = await db.chapterRecords.count()
-      setChapterNumber(number)
+      const { chapterCount } = await fetchRecordCounts()
+      setChapterNumber(chapterCount)
     }
 
     fetchChapterNumber()
@@ -22,7 +22,7 @@ export function useDayFromFirstWordRecord() {
 
   useEffect(() => {
     const fetchDayFromFirstWordRecord = async () => {
-      const firstWordRecord = await db.wordRecords.orderBy('timeStamp').first()
+      const firstWordRecord = await fetchFirstWordRecord()
       const firstWordRecordTimeStamp = firstWordRecord?.timeStamp || 0
       const now = dayjs()
       const timestamp = dayjs.unix(firstWordRecordTimeStamp)
@@ -41,8 +41,8 @@ export function useWordNumber() {
 
   useEffect(() => {
     const fetchWordNumber = async () => {
-      const number = await db.wordRecords.count()
-      setWordNumber(number)
+      const { wordCount } = await fetchRecordCounts()
+      setWordNumber(wordCount)
     }
 
     fetchWordNumber()
@@ -56,11 +56,7 @@ export function useSumWrongCount() {
 
   useEffect(() => {
     const fetchSumWrongCount = async () => {
-      let totalWrongCount = 0
-
-      await db.chapterRecords.each((record) => {
-        totalWrongCount += record.wrongCount || 0
-      })
+      const totalWrongCount = await fetchTotalWrongCount()
       setSumWrongCount(totalWrongCount)
     }
 

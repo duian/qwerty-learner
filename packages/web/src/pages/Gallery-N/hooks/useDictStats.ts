@@ -1,4 +1,4 @@
-import { db } from '@/utils/db'
+import { fetchChapterRecords } from '@/api/record-api'
 import type { IChapterRecord } from '@/utils/db/record'
 import { useEffect, useState } from 'react'
 
@@ -25,7 +25,7 @@ interface IDictStats {
 }
 
 async function getDictStats(dict: string): Promise<IDictStats> {
-  const records: IChapterRecord[] = await db.chapterRecords.where({ dict }).toArray()
+  const records: IChapterRecord[] = await fetchChapterRecords(dict)
   const allChapter = records.map(({ chapter }) => chapter).filter((item) => item !== null) as number[]
   const uniqueChapter = allChapter.filter((value, index, self) => {
     return self.indexOf(value) === index

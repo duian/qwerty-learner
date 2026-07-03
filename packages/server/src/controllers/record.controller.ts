@@ -113,4 +113,72 @@ export class RecordController {
       next(err);
     }
   };
+
+  getWordRecordsByTimeRange = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { startTimeStamp, endTimeStamp } = req.query as { startTimeStamp?: string; endTimeStamp?: string };
+      if (!startTimeStamp || !endTimeStamp) {
+        return res.status(400).json({ success: false, message: "startTimeStamp and endTimeStamp are required" });
+      }
+      const records = await recordService.getWordRecordsByTimeRange(Number(startTimeStamp), Number(endTimeStamp));
+      res.json({ success: true, data: records });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getRecordCounts = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const [wordCount, chapterCount] = await Promise.all([
+        recordService.getWordRecordCount(),
+        recordService.getChapterRecordCount(),
+      ]);
+      res.json({ success: true, data: { wordCount, chapterCount } });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getFirstWordRecord = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const record = await recordService.getFirstWordRecord();
+      res.json({ success: true, data: record });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getTotalWrongCount = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const totalWrongCount = await recordService.getTotalWrongCount();
+      res.json({ success: true, data: { totalWrongCount } });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getRevisionWordCount = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dict = req.query.dict as string | undefined;
+      if (!dict) {
+        return res.status(400).json({ success: false, message: "dict is required" });
+      }
+      const wordCount = await recordService.getRevisionWordCount(dict);
+      res.json({ success: true, data: { wordCount } });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  exportAllRecords = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const [wordRecords, chapterRecords] = await Promise.all([
+        recordService.getAllWordRecords(),
+        recordService.getAllChapterRecords(),
+      ]);
+      res.json({ success: true, data: { wordRecords, chapterRecords } });
+    } catch (err) {
+      next(err);
+    }
+  };
 }

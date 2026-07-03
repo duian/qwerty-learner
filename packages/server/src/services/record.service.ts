@@ -1,6 +1,6 @@
 import { db } from "../models";
 import { wordRecords, chapterRecords, reviewRecords } from "../models/schema";
-import { eq, and, gt, desc } from "drizzle-orm";
+import { eq, and, gt, gte, lte, desc, count, sql } from "drizzle-orm";
 
 export class RecordService {
   async addWordRecord(data: {
@@ -75,7 +75,8 @@ export class RecordService {
   async getChapterRecords(dict?: string, chapter?: number) {
     const conditions = [];
     if (dict) conditions.push(eq(chapterRecords.dict, dict));
-    if (chapter !== undefined) conditions.push(eq(chapterRecords.chapter, chapter));
+    if (chapter !== undefined)
+      conditions.push(eq(chapterRecords.chapter, chapter));
     const rows = await db
       .select()
       .from(chapterRecords)
@@ -91,7 +92,9 @@ export class RecordService {
     const rows = await db
       .select()
       .from(reviewRecords)
-      .where(and(eq(reviewRecords.dict, dict), eq(reviewRecords.isFinished, false)))
+      .where(
+        and(eq(reviewRecords.dict, dict), eq(reviewRecords.isFinished, false))
+      )
       .orderBy(desc(reviewRecords.createTime))
       .limit(1);
     if (rows.length === 0) return null;
@@ -128,5 +131,85 @@ export class RecordService {
       })
       .returning({ id: reviewRecords.id });
     return result[0].id;
+  }
+
+  async getWordRecordsByTimeRange(startTimeStamp: number, endTimeStamp: number) {
+    const rows = await db
+      .select()
+      .from(wordRecords)
+      .where(
+        and(
+          gte(wordRecords.timeStamp, startTimeStamp),
+          lte(wordRecords.timeStamp, endTimeStamp)
+        )
+      );
+    return rows.map((r) => ({
+      ...r,
+      timing: JSON.parse(r.timing) as number[],
+      mistakes: JSON.parse(r.mistakes) as Record<number, string[]>,
+    }));
+  }
+
+  async getWordRecordCount() {
+    const result = await db.select({ value: count() }).from(wordRecords);
+    return result[0].value;
+  }
+
+  async getChapterRecordCount() {
+    const result = await db.select({ value: count() }).from(chapterRecords);
+    return result[0].value;
+  }
+
+  async getFirstWordRecord() {
+    const rows = await db
+      .select()
+      .from(wordRecords)
+      .orderBy(wordRecords.timeStamp)
+      .limit(1);
+    if (rows.length === 0) return null;
+    const r = rows[0];
+    return {
+      ...r,
+      timing: JSON.parse(r.timing) as number[],
+      mistakes: JSON.parse(r.mistakes) as Record<number, string[]>,
+    };
+  }
+
+  async getTotalWrongCount() {
+    const result = await db
+      .select({ value: sql<number>`sum(${chapterRecords.wrongCount})` })
+      .from(chapterRecords);
+    return result[0].value ?? 0;
+  }
+
+  async getRevisionWordCount(dict: string) {
+    const rows = await db
+      .select({ word: wordRecords.word, dict: wordRecords.dict })
+      .from(wordRecords)
+      .where(and(eq(wordRecords.dict, dict), gt(wordRecords.wrongCount, 0)));
+    // deduplicate by word+dict
+    const seen = new Set<string>();
+    for (const r of rows) {
+      seen.add(r.word + r.dict);
+    }
+    return seen.size;
+  }
+
+  async getAllWordRecords() {
+    const rows = await db.select().from(wordRecords);
+    return rows.map((r) => ({
+      ...r,
+      timing: JSON.parse(r.timing) as number[],
+      mistakes: JSON.parse(r.mistakes) as Record<number, string[]>,
+    }));
+  }
+
+  async getAllChapterRecords() {
+    const rows = await db.select().from(chapterRecords);
+    return rows.map((r) => ({
+      ...r,
+      correctWordIndexes: JSON.parse(r.correctWordIndexes) as number[],
+      wordRecordIds: JSON.parse(r.wordRecordIds) as number[],
+    }));
   }
 }

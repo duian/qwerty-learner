@@ -11,7 +11,7 @@ import {
   reviewModeInfoAtom,
   wordDictationConfigAtom,
 } from '@/store'
-import { db } from '@/utils/db'
+import { deleteWordRecord as apiDeleteWordRecord } from '@/api/record-api'
 import { Transition } from '@headlessui/react'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useContext, useEffect, useMemo, useRef } from 'react'
@@ -64,13 +64,7 @@ const ResultScreen = () => {
     if (correctWords.length === 0) return
 
     // 从 DB 删除正确完成的单词的所有错误记录
-    const deletePromises = correctWords.map((wordName) =>
-      db.wordRecords
-        .where('word')
-        .equals(wordName)
-        .and((r) => r.wrongCount > 0)
-        .delete(),
-    )
+    const deletePromises = correctWords.map((wordName) => apiDeleteWordRecord(wordName, reviewModeInfo.reviewRecord?.dict ?? ''))
     Promise.all(deletePromises).catch(console.error)
   }, [isErrorBookMode, reviewModeInfo.reviewRecord?.words, state.chapterData.userInputLogs, state.chapterData.words])
 
