@@ -1,8 +1,10 @@
 import type { IChapterRecord, IReviewRecord, IRevisionDictRecord, IWordRecord, LetterMistakes } from './record'
 import { ChapterRecord, ReviewRecord, WordRecord } from './record'
+import { postChapterRecord, postWordRecord } from '@/api/record-api'
 import { TypingContext, TypingStateActionType } from '@/pages/Typing/store'
 import type { TypingState } from '@/pages/Typing/store/type'
 import { currentChapterAtom, currentDictIdAtom, isReviewModeAtom } from '@/store'
+import { getUTCUnixTimestamp } from '@/utils'
 import type { Table } from 'dexie'
 import Dexie from 'dexie'
 import { useAtomValue } from 'jotai'
@@ -53,18 +55,18 @@ export function useSaveChapterRecord() {
       } = typingState
       const correctWordIndexes = userInputLogs.filter((log) => log.correctCount > 0 && log.wrongCount === 0).map((log) => log.index)
 
-      const chapterRecord = new ChapterRecord(
-        dictID,
-        isRevision ? -1 : currentChapter,
+      postChapterRecord({
+        dict: dictID,
+        chapter: isRevision ? -1 : currentChapter,
+        timeStamp: getUTCUnixTimestamp(),
         time,
         correctCount,
         wrongCount,
         wordCount,
         correctWordIndexes,
-        words.length,
-        wordRecordIds ?? [],
-      )
-      db.chapterRecords.add(chapterRecord)
+        wordNumber: words.length,
+        wordRecordIds: wordRecordIds ?? [],
+      })
     },
     [currentChapter, dictID, isRevision],
   )
@@ -109,11 +111,17 @@ export function useSaveWordRecord() {
       const finalDictId = overrideDictId ?? dictID
       const finalChapter = overrideChapter !== undefined ? overrideChapter : isRevision ? -1 : currentChapter
 
-      const wordRecord = new WordRecord(word, finalDictId, finalChapter, timing, wrongCount, letterMistake)
-
       let dbID = -1
       try {
-        dbID = await db.wordRecords.add(wordRecord)
+        dbID = await postWordRecord({
+          word,
+          dict: finalDictId,
+          chapter: finalChapter,
+          timeStamp: getUTCUnixTimestamp(),
+          timing,
+          wrongCount,
+          mistakes: letterMistake,
+        })
       } catch (e) {
         console.error(e)
       }
