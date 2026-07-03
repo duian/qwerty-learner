@@ -48,25 +48,29 @@ export function useSaveChapterRecord() {
   const dictID = useAtomValue(currentDictIdAtom)
 
   const saveChapterRecord = useCallback(
-    (typingState: TypingState) => {
+    async (typingState: TypingState) => {
       const {
         chapterData: { correctCount, wrongCount, userInputLogs, wordCount, words, wordRecordIds },
         timerData: { time },
       } = typingState
       const correctWordIndexes = userInputLogs.filter((log) => log.correctCount > 0 && log.wrongCount === 0).map((log) => log.index)
 
-      postChapterRecord({
-        dict: dictID,
-        chapter: isRevision ? -1 : currentChapter,
-        timeStamp: getUTCUnixTimestamp(),
-        time,
-        correctCount,
-        wrongCount,
-        wordCount,
-        correctWordIndexes,
-        wordNumber: words.length,
-        wordRecordIds: wordRecordIds ?? [],
-      })
+      try {
+        await postChapterRecord({
+          dict: dictID,
+          chapter: isRevision ? -1 : currentChapter,
+          timeStamp: getUTCUnixTimestamp(),
+          time,
+          correctCount,
+          wrongCount,
+          wordCount,
+          correctWordIndexes,
+          wordNumber: words.length,
+          wordRecordIds: wordRecordIds ?? [],
+        })
+      } catch (e) {
+        console.error(e)
+      }
     },
     [currentChapter, dictID, isRevision],
   )
