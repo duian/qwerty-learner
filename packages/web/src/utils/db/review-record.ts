@@ -1,14 +1,15 @@
-import { db } from '.'
-import { ReviewRecord } from './record'
+import { fetchLatestReview, postReviewRecord } from '@/api/record-api'
 import type { TErrorWordData } from '@/pages/Gallery-N/hooks/useErrorWords'
 import type { Word } from '@/typings'
+import { getUTCUnixTimestamp } from '@/utils'
+import { ReviewRecord } from './record'
 import { useEffect, useState } from 'react'
 
 export function useGetLatestReviewRecord(dictID: string) {
   const [wordReviewRecord, setWordReviewRecord] = useState<ReviewRecord | undefined>(undefined)
   useEffect(() => {
     const fetchWordReviewRecords = async () => {
-      const record = await getReviewRecords(dictID)
+      const record = await getLatestReviewRecord(dictID)
       setWordReviewRecord(record)
     }
     if (dictID) {
@@ -18,12 +19,18 @@ export function useGetLatestReviewRecord(dictID: string) {
   return wordReviewRecord
 }
 
-async function getReviewRecords(dictID: string): Promise<ReviewRecord | undefined> {
-  const records = await db.reviewRecords.where('dict').equals(dictID).toArray()
+async function getLatestReviewRecord(dictID: string): Promise<ReviewRecord | undefined> {
+  const data = await fetchLatestReview(dictID)
+  if (!data) return undefined
+  if (data.isFinished) return undefined
 
-  const latestRecord = records.sort((a, b) => a.createTime - b.createTime).pop()
-
-  return latestRecord && (latestRecord.isFinished ? undefined : latestRecord)
+  // Reconstruct ReviewRecord from server response
+  const record = new ReviewRecord(data.dict, data.words as Word[])
+  record.id = data.id
+  record.index = data.index
+  record.createTime = data.createTime
+  record.isFinished = data.isFinished
+  return record
 }
 
 type TRankedErrorWordData = TErrorWordData & {
@@ -57,12 +64,28 @@ export async function generateNewWordReviewRecord(dictID: string, errorData: TEr
     })
     .map((item) => item.originData)
 
-  const record = new ReviewRecord(dictID, sortedWords)
+  const createTime = getUTCUnixTimestamp()
+  const id = await postReviewRecord({
+    dict: dictID,
+    index: 0,
+    createTime,
+    isFinished: false,
+    words: sortedWords,
+  })
 
-  await db.reviewRecords.put(record)
+  const record = new ReviewRecord(dictID, sortedWords)
+  record.id = id
+  record.createTime = createTime
   return record
 }
 
 export async function putWordReviewRecord(record: ReviewRecord) {
-  db.reviewRecords.put(record)
+  await postReviewRecord({
+    id: record.id,
+    dict: record.dict,
+    index: record.index,
+    createTime: record.createTime,
+    isFinished: record.isFinished,
+    words: record.words,
+  })
 }

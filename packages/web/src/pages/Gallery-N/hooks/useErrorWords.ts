@@ -1,5 +1,5 @@
 import type { Dictionary, Word } from '@/typings'
-import { db } from '@/utils/db'
+import { fetchWordErrors } from '@/api/record-api'
 import type { WordRecord } from '@/utils/db/record'
 import { wordListFetcher } from '@/utils/wordListFetcher'
 import { useEffect, useState } from 'react'
@@ -27,11 +27,7 @@ export default function useErrorWordData(dict: Dictionary, reload: boolean) {
   useEffect(() => {
     if (!wordList) return
 
-    db.wordRecords
-      .where('wrongCount')
-      .above(0)
-      .filter((record) => record.dict === dict.id)
-      .toArray()
+    fetchWordErrors(dict.id)
       .then((records) => {
         const groupRecords: groupRecord[] = []
 

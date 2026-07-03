@@ -1,12 +1,12 @@
 import { idDictionaryMap } from '@/resources/dictionary'
 import type { Word } from '@/typings'
-import { db } from '@/utils/db'
+import { fetchWordErrors } from '@/api/record-api'
 import { wordListFetcher } from '@/utils/wordListFetcher'
 import { useCallback, useState } from 'react'
 
 /**
  * 获取错题集中所有单词的完整 Word 数据
- * 从 DB 读取错题记录，去重后按词典分组，批量 fetch 词典文件匹配出 Word 对象
+ * 从 API 读取错题记录，去重后按词典分组，批量 fetch 词典文件匹配出 Word 对象
  */
 export function useErrorBookWords() {
   const [isLoading, setIsLoading] = useState(false)
@@ -14,7 +14,7 @@ export function useErrorBookWords() {
   const fetchErrorBookWords = useCallback(async (): Promise<Word[]> => {
     setIsLoading(true)
     try {
-      const records = await db.wordRecords.where('wrongCount').above(0).toArray()
+      const records = await fetchWordErrors()
 
       // 按词典分组，去重单词
       const dictWordMap = new Map<string, Set<string>>()

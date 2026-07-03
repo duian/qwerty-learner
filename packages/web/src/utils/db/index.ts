@@ -1,6 +1,6 @@
 import type { IChapterRecord, IReviewRecord, IRevisionDictRecord, IWordRecord, LetterMistakes } from './record'
 import { ChapterRecord, ReviewRecord, WordRecord } from './record'
-import { postChapterRecord, postWordRecord } from '@/api/record-api'
+import { deleteWordRecord as apiDeleteWordRecord, postChapterRecord, postWordRecord } from '@/api/record-api'
 import { TypingContext, TypingStateActionType } from '@/pages/Typing/store'
 import type { TypingState } from '@/pages/Typing/store/type'
 import { currentChapterAtom, currentDictIdAtom, isReviewModeAtom } from '@/store'
@@ -143,8 +143,7 @@ export function useSaveWordRecord() {
 export function useDeleteWordRecord() {
   const deleteWordRecord = useCallback(async (word: string, dict: string) => {
     try {
-      const deletedCount = await db.wordRecords.where({ word, dict }).delete()
-      return deletedCount
+      await apiDeleteWordRecord(word, dict)
     } catch (error) {
       console.error(`删除单词记录时出错：`, error)
     }

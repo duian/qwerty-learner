@@ -8,9 +8,10 @@ import { useErrorBookWords } from './hooks/useErrorBookWords'
 import { currentRowDetailAtom } from './store'
 import type { groupedWordRecords } from './type'
 import { reviewModeInfoAtom } from '@/store'
-import { db, useDeleteWordRecord } from '@/utils/db'
+import { useDeleteWordRecord } from '@/utils/db'
 import type { WordRecord } from '@/utils/db/record'
 import { ReviewRecord } from '@/utils/db/record'
+import { fetchWordErrors } from '@/api/record-api'
 import * as ScrollArea from '@radix-ui/react-scroll-area'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -68,10 +69,7 @@ export function ErrorBook() {
   }, [currentPage, sortedRecords])
 
   useEffect(() => {
-    db.wordRecords
-      .where('wrongCount')
-      .above(0)
-      .toArray()
+    fetchWordErrors()
       .then((records) => {
         const groups: groupedWordRecords[] = []
 
